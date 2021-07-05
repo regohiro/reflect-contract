@@ -1,0 +1,9 @@
+node_modules
+#Hardhat files
+cache
+artifacts
+secrets
+.env
+utilities/contractAddr.json
+typechain
+yarn-error.log
