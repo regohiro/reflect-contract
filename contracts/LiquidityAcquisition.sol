@@ -73,7 +73,7 @@ contract LiquidityAcquisition is InternalToken, Ownable {
     }
   }
 
-  function addLiquidity(uint256 tokenAmount, uint256 bnbAmount) internal {
+  function addLiquidity(uint256 tokenAmount, uint256 bnbAmount) public onlyOwner {
     _approve(address(this), address(uniswapV2Router), tokenAmount);
 
     try
