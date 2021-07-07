@@ -1,5 +1,5 @@
 import { ethers } from "hardhat";
-import { CatDoge } from './../typechain/CatDoge.d';
+import { CatDoge } from '../typechain/CatDoge';
 import { toBN, setDefaultSigner, deployer, deployToLiveNetwork, verify } from '../utilities';
 
 /*
@@ -31,3 +31,5 @@ main()
     console.error(error);
     process.exit(1);
   });
+
+  
