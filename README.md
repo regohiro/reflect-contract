@@ -24,10 +24,10 @@ Note: requires Mnemonic and Moralis API key
 npx hardhat run deploy/index.ts --network bsctestnet
 ```
 
-### Clean build files
+### Rebuild contracts
 
 Note: May need to give permession
 
 ```sh
-./clean.sh
+./rebuild.sh
 ```
