@@ -34,7 +34,7 @@ contract CatDoge is ReflectiveToken {
   event OnStakingExclude(address account);
   event OnWithdrawIsolatedBNB(uint256 amount);
 
-  constructor() ReflectiveToken("CatDoge", "CATDOGE", 10**10, 9, 2, 8) {
+  constructor() ReflectiveToken("CatDoge", "CATDOGE", 10**15, 6, 2, 8) {
     _tOwned[_msgSender()] = _tTotal;
 
     // 0.03% of total supply
