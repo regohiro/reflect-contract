@@ -127,18 +127,4 @@ contract Crowdsale is Context, ReentrancyGuard, Ownable {
   function _getTokenAmount(uint256 weiAmount) internal view returns (uint256) {
     return weiAmount * rate;
   }
-
-  function withdrawFunds(uint256 _amount) external onlyOwner {
-    //Checks
-    require(_amount <= address(this).balance, "Crowdsale: Insufficient balance");
-    //Interactions
-    (bool success, ) = payable(wallet).call{ value: _amount }("");
-    require(success, "Crowdsale: Forward funds failed");
-  }
-
-  function withdrawRemainingTokens() external onlyOwner {
-    uint256 amount = token.balanceOf(address(this));
-    require(amount > 0, "Crowdsale: amount is 0");
-    token.transfer(wallet, amount);
-  }
 }

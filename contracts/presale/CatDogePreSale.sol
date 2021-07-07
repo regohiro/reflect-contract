@@ -46,4 +46,20 @@ contract CatDogePreSale is TimedCrowdsale {
     super._updatePurchasingState(_beneficiary, _weiAmount);
     contributions[_beneficiary] += _weiAmount;
   }
+
+  function withdrawFunds(uint256 _amount) external onlyOwner {
+    //Checks
+    require(hasClosed(), "Crowdsale: Cannot withdraw until presale is over");
+    require(_amount <= address(this).balance, "Crowdsale: Insufficient balance");
+    //Interactions
+    (bool success, ) = payable(wallet).call{ value: _amount }("");
+    require(success, "Crowdsale: Forward funds failed");
+  }
+
+  function withdrawRemainingTokens() external onlyOwner {
+    require(hasClosed(), "Crowdsale: Cannot withdraw until presale is over");
+    uint256 amount = token.balanceOf(address(this));
+    require(amount > 0, "Crowdsale: amount is 0");
+    token.transfer(wallet, amount);
+  }
 }
