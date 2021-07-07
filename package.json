@@ -2,7 +2,7 @@
   "name": "mirage-protocol",
   "version": "0.0.3",
   "description": "",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
     "compile": "npx hardhat compile",
     "test": "npx hardhat test"
