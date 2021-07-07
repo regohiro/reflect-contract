@@ -65,33 +65,32 @@ contract Crowdsale is Context, ReentrancyGuard {
   // function() external payable {
   //   buyTokens(_msgSender());
   // }
-  // receive() external payable 
 
   /**
    * @return the token being sold.
    */
-  function token() public view returns (IERC20) {
+  function token() external view returns (IERC20) {
     return _token;
   }
 
   /**
    * @return the address where funds are collected.
    */
-  function wallet() public view returns (address) {
+  function wallet() external view returns (address) {
     return _wallet;
   }
 
   /**
    * @return the number of token units a buyer gets per wei.
    */
-  function rate() public view returns (uint256) {
+  function rate() external view returns (uint256) {
     return _rate;
   }
 
   /**
    * @return the amount of wei raised.
    */
-  function weiRaised() public view returns (uint256) {
+  function weiRaised() external view returns (uint256) {
     return _weiRaised;
   }
 
@@ -100,8 +99,8 @@ contract Crowdsale is Context, ReentrancyGuard {
    * This function has a non-reentrancy guard, so it shouldn't be called by
    * another `nonReentrant` function.
    */
-  function buyTokens() public payable nonReentrant {
-    address beneficiary = msg.sender;
+  function buyTokens() external payable nonReentrant {
+    address beneficiary = msg.sender; // Recipient of the token purchase
     uint256 weiAmount = msg.value;
     _preValidatePurchase(beneficiary, weiAmount);
 
