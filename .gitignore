@@ -7,3 +7,4 @@ secrets
 utilities/contractAddr.json
 typechain
 yarn-error.log
+.DS_Store
