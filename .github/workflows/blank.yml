@@ -33,4 +33,5 @@ jobs:
       - name: Run a multi-line script
         run: |
           yarn install
+          yarn compile
           yarn test
