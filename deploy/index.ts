@@ -1,11 +1,6 @@
-<<<<<<< HEAD
-import { CatDogePreSale } from './../typechain/CatDogePreSale.d';
+import { PreSale } from './../typechain/PreSale.d';
 import { CatDoge } from '../typechain/CatDoge';
 import { ethers } from "hardhat";
-=======
-import { ethers } from "hardhat";
-import { CatDoge } from './../typechain/CatDoge.d';
->>>>>>> main
 import { toBN, setDefaultSigner, deployer, deployToLiveNetwork, verify } from '../utilities';
 
 /*
@@ -35,9 +30,10 @@ async function main() {
   const openingTime = (1625639400).toString();
   const closingTime = (1625641200).toString();
   const caps = toBN(10);
+  const minBuyLimit = toBN(0.01);
 
   //Deploy CatDogePreSale
-  const cdps = (await deployer("CatDogePreSale", rate, wallet, token, openingTime, closingTime, caps)) as CatDogePreSale;
+  const cdps = (await deployer("PreSale", rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as PreSale;
 }
 
 //Excute deploy
