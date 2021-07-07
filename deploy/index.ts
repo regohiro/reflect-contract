@@ -1,6 +1,11 @@
+<<<<<<< HEAD
 import { CatDogePreSale } from './../typechain/CatDogePreSale.d';
 import { CatDoge } from '../typechain/CatDoge';
 import { ethers } from "hardhat";
+=======
+import { ethers } from "hardhat";
+import { CatDoge } from './../typechain/CatDoge.d';
+>>>>>>> main
 import { toBN, setDefaultSigner, deployer, deployToLiveNetwork, verify } from '../utilities';
 
 /*
@@ -43,5 +48,3 @@ main()
     console.error(error);
     process.exit(1);
   });
-
-  
