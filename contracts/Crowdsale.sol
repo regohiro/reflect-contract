@@ -59,6 +59,7 @@ contract CatDogePresale is Context, ReentrancyGuard, Ownable {
     require(_rate > 0, "Crowdsale: rate is 0");
     require(_wallet != address(0), "Crowdsale: wallet is the zero address");
     require(address(_token) != address(0), "Crowdsale: token is the zero address");
+    require(_maxBuyLimit >= _minBuyLimit, "Crowdsale: Max < Min");
 
     rate = _rate;
     wallet = _wallet;
@@ -72,6 +73,7 @@ contract CatDogePresale is Context, ReentrancyGuard, Ownable {
   }
 
   function setBuyLimits(uint256 _min, uint256 _max) external onlyOwner {
+    require(_max >= _min, "Crowdsale: Max < Min");
     minBuyLimit = _min;
     maxBuyLimit = _max;
   }
@@ -82,7 +84,7 @@ contract CatDogePresale is Context, ReentrancyGuard, Ownable {
    * another `nonReentrant` function.
    */
   function buyTokens() external payable nonReentrant {
-    require(isSaleActive, "Presale has not started");
+    require(isSaleActive, "Crowdsale: Presale has not started");
 
     address beneficiary = msg.sender; // Recipient of the token purchase
     uint256 weiAmount = msg.value;
