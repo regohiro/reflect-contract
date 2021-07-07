@@ -114,7 +114,6 @@ contract CatDogePresale is Context, ReentrancyGuard, Ownable {
     require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
     require(weiAmount != 0, "Crowdsale: weiAmount is 0");
     require(tokens >= minBuyLimit && tokens <= maxBuyLimit, "Crowdsale: Token amount out of bounds");
-    this; // silence state mutability warning without generating bytecode - see https://github.com/ethereum/solidity/issues/2691
   }
 
   /**
