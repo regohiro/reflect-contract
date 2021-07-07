@@ -4,7 +4,7 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./ReflectiveToken.sol";
 
-contract CatDoge is ReflectiveToken {
+contract CatDoge is ReflectiveToken { 
   using EnumerableSet for EnumerableSet.AddressSet;
 
   mapping(address => uint256) public stakeValue;

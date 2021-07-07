@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "./Crowdsale.sol";
 
-/**
+/** 
  * @title TimedCrowdsale
  * @dev Crowdsale accepting contributions only within a time frame.
  */

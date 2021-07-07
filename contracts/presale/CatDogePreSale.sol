@@ -2,7 +2,7 @@
 pragma solidity ^0.8.4;
 
 import "./TimedCrowdsale.sol";
-
+ 
 contract CatDogePreSale is TimedCrowdsale {
 
   mapping(address => uint256) public contributions;

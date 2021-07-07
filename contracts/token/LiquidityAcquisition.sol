@@ -7,7 +7,7 @@ import "./uniswapv2/interfaces/IUniswapV2Router02.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InternalToken {
-  // This is always expected to be
+  // This is always expected to be 
   // overwritten by a parent contract
   function _approve(
     address owner,

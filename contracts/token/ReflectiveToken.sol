@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "./ReflectiveERC20.sol";
 import "./LiquidityAcquisition.sol";
-
+ 
 contract ReflectiveToken is ReflectiveERC20 {
   constructor(
     string memory name_,

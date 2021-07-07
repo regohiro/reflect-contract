@@ -6,14 +6,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-
+ 
 /**
  * @title Crowdsale
  * Created by OpenZepplein
  * Modified by MacroBlock for Solidity ^0.8.0
  */
 contract Crowdsale is Context, ReentrancyGuard, Ownable {
-  using SafeERC20 for IERC20;
+  using SafeERC20 for IERC20; 
 
   // CatDoge Token
   IERC20 public token;
