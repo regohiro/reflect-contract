@@ -25,8 +25,7 @@ contract CatDoge is ReflectiveToken {
   uint256 private immutable numTokensSellToAddToLiquidity;
   uint256 private constant DISTRIBUTION_MULTIPLIER = 2**64;
 
-  EnumerableSet.AddressSet private _stakingExcluded;
-  mapping(address => bool) private _isBlacklisted;
+  EnumerableSet.AddressSet _stakingExcluded;
 
   event OnWithdraw(address sender, uint256 amount);
   event OnDistribute(uint256 tokenAmount, uint256 bnbReceived);
@@ -34,13 +33,13 @@ contract CatDoge is ReflectiveToken {
   event OnStakingExclude(address account);
   event OnWithdrawIsolatedBNB(uint256 amount);
 
-  constructor() ReflectiveToken("CatDoge", "CATDOGE", 10**10, 9, 2, 8) {
+  constructor() ReflectiveToken("CatDoge", "CatDoge", 10**10, 9, 2, 8) {
     _tOwned[_msgSender()] = _tTotal;
 
     // 0.03% of total supply
     numTokensSellToAddToLiquidity = (30000 * _tTotal) / 10**8;
 
-    // 0.1% of total supply on both buy/sell initially (Whale prevention)
+    // 0.1% of total supply on both buy/sell initially
     buyLimit = (1000 * _tTotal) / 10**6;
     sellLimit = (1000 * _tTotal) / 10**6;
 
@@ -104,7 +103,6 @@ contract CatDoge is ReflectiveToken {
     bool takeFee
   ) internal virtual override returns (uint256) {
     require(sender != recipient, "Sending to yourself is disallowed");
-    require(!_isBlacklisted[sender] && !_isBlacklisted[recipient], "Blacklisted account");
     _validateTransfer(sender, recipient, amount, takeFee);
 
     (
@@ -241,11 +239,9 @@ contract CatDoge is ReflectiveToken {
   function withdraw() external payable {
     uint256 share = dividendsOf(_msgSender());
 
-    //Effects
     // Resetting dividends back to 0
     stakerPayouts[_msgSender()] = stakeValue[_msgSender()] * profitPerShare;
 
-    //Interactions
     _withdraw(_msgSender(), share);
   }
 
