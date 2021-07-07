@@ -4,7 +4,6 @@ pragma solidity ^0.8.4;
 import "./uniswapv2/interfaces/IUniswapV2Pair.sol";
 import "./uniswapv2/interfaces/IUniswapV2Factory.sol";
 import "./uniswapv2/interfaces/IUniswapV2Router02.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InternalToken {
   // This is always expected to be
@@ -16,11 +15,9 @@ contract InternalToken {
   ) internal virtual {}
 }
 
-contract LiquidityAcquisition is InternalToken, Ownable {
-  IUniswapV2Router02 public uniswapV2Router;
-  IUniswapV2Pair public uniswapV2Pair;
-
-  event SwapFailure(string reason);
+contract LiquidityAcquisition is InternalToken {
+  IUniswapV2Router02 public immutable uniswapV2Router;
+  IUniswapV2Pair public immutable uniswapV2Pair;
 
   constructor() {
     IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3);
@@ -31,13 +28,7 @@ contract LiquidityAcquisition is InternalToken, Ownable {
     uniswapV2Pair = _uniswapV2Pair;
   }
 
-  function setRouterAddress(address newRouter) public onlyOwner {
-    IUniswapV2Router02 _newPancakeRouter = IUniswapV2Router02(newRouter);
-    uniswapV2Pair = IUniswapV2Pair(
-      IUniswapV2Factory(_newPancakeRouter.factory()).createPair(address(this), _newPancakeRouter.WETH())
-    );
-    uniswapV2Router = _newPancakeRouter;
-  }
+  event SwapFailure(string reason);
 
   // Always expected to be overwritten by parent contract
   // since its' implementation is contract-specific
@@ -73,7 +64,7 @@ contract LiquidityAcquisition is InternalToken, Ownable {
     }
   }
 
-  function addLiquidity(uint256 tokenAmount, uint256 bnbAmount) public onlyOwner {
+  function addLiquidity(uint256 tokenAmount, uint256 bnbAmount) internal {
     _approve(address(this), address(uniswapV2Router), tokenAmount);
 
     try
