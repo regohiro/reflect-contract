@@ -1,7 +1,7 @@
 import { ethers, waffle } from "hardhat";
 import { CatDoge } from './../typechain/CatDoge.d';
 import { toBN, getContractInstance } from '../utilities';
-
+ 
 async function main() {
   //List accounts
   const accounts = await ethers.provider.listAccounts(); //returns addresses
