@@ -24,11 +24,11 @@ async function main() {
   const cd = (await deployer("CatDoge")) as CatDoge;
 
   //Set CatDoge Presale args
-  const rate = (3 * 10 ** 9).toString();
+  const rate = (3 * 10 ** 9).toString(); //1BNB = ? CatDoge
   const wallet = ownerAddr;
   const token = cd.address;
-  const openingTime = (toUnix("7/8/2021 9:45:00")).toString();
-  const closingTime = (toUnix("7/8/2021 11:00:00")).toString();
+  const openingTime = (toUnix("7/8/2021 20:25:00")).toString();
+  const closingTime = (toUnix("7/8/2021 21:00:00")).toString();
   const caps = toBN(10);  //in BNB
   const minBuyLimit = toWei(0.01);   //in BNB 
 
