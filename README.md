@@ -18,10 +18,10 @@ $ yarn compile
 
 ### Deploy contract to a live network + validate to bscscan
 
-Note: requires Mnemonic and Moralis API key
+Note: requires mnemonic and Moralis API key
 
 ```
-npx hardhat run deploy/index.ts --network bsctestnet
+npx hardhat run deploy --network bsctestnet
 ```
 
 ### Rebuild contracts
