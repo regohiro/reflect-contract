@@ -2,12 +2,11 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
-
 import "./LiquidityAcquisition.sol";
+// import "hardhat/console.sol";
 
-contract ReflectiveERC20 is IERC20, Context, Ownable, LiquidityAcquisition {
+contract ReflectiveERC20 is IERC20, Context, LiquidityAcquisition {
   mapping(address => uint256) internal _rOwned;
   mapping(address => uint256) internal _tOwned;
   mapping(address => mapping(address => uint256)) internal _allowances;
@@ -173,6 +172,7 @@ contract ReflectiveERC20 is IERC20, Context, Ownable, LiquidityAcquisition {
       tFee = (tAmount * reflectionFee) / 100;
       tSwap = (tAmount * swapFee) / 100;
     }
+
 
     uint256 tTransferAmount = tAmount - tFee - tSwap;
 
