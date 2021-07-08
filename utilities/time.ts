@@ -24,4 +24,9 @@ export async function latest() {
   return BigNumber.from(block.timestamp);
 }
 
+export function toUnix(strDate: string) {
+  const datum = Date.parse(strDate);
+  return datum / 1000;
+}
+
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
