@@ -5,6 +5,7 @@ import "@openzeppelin/contracts/utils/Context.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
+// import "hardhat/console.sol";
 
 contract PreSale is Context, Ownable{
   using SafeERC20 for IERC20; 
@@ -82,7 +83,7 @@ contract PreSale is Context, Ownable{
     uint256 weiAmount = msg.value;
 
     // calculate token amount to transfer
-    uint256 tokens = weiAmount * rate;
+    uint256 tokens = (weiAmount * rate) * 10**3 / 10**18;
 
     //Checks
     _preValidatePurchase(beneficiary, weiAmount);
@@ -92,7 +93,7 @@ contract PreSale is Context, Ownable{
     contributions[beneficiary] += weiAmount;
 
     //Interactions
-    token.safeTransfer(beneficiary, tokens);
+    token.transfer(beneficiary, tokens);
     emit TokensPurchased(_msgSender(), beneficiary, weiAmount, tokens);
   }
 
@@ -106,7 +107,7 @@ contract PreSale is Context, Ownable{
   ) internal view onlyWhileOpen{
     require(beneficiary != address(0), "Crowdsale: beneficiary is the zero address");
     require(weiAmount != 0, "Crowdsale: weiAmount is 0");
-    require(minBuyLimit >= weiAmount, "Crowdsale: need to buy more");
+    require(minBuyLimit <= weiAmount, "Crowdsale: need to buy more");
     require(contributions[beneficiary] + weiAmount <= caps, "Crowdsale: exceeded cap!");
   }
 
