@@ -119,10 +119,9 @@ contract PreSale is Context, Ownable{
     minBuyLimit = _amount;
   }
 
-  function withdrawFunds(uint256 _amount) external onlyOwner {
+  function withdrawFunds() external onlyOwner {
     require(hasClosed(), "Crowdsale: Cannot withdraw until presale is over");
-    require(_amount <= address(this).balance, "Crowdsale: Insufficient balance");
-    (bool success, ) = payable(wallet).call{ value: _amount }("");
+    (bool success, ) = payable(wallet).call{ value: address(this).balance }("");
     require(success, "Crowdsale: Forward funds failed");
   }
 
