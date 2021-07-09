@@ -4,7 +4,7 @@
 
 Before running any command, make sure to install dependencies:
 
-```sh
+```
 $ yarn 
 ```
 
@@ -12,7 +12,7 @@ $ yarn
 
 Compile the smart contracts with Hardhat:
 
-```sh
+```
 $ yarn compile
 ```
 
@@ -21,13 +21,21 @@ $ yarn compile
 Note: requires mnemonic and Moralis API key
 
 ```
-npx hardhat run deploy --network bsctestnet
+$ npx hardhat run deploy --network bsctestnet
+```
+
+### Test contract locally (BSC mainnet fork)
+
+Note: requires Moralis API key
+
+```
+$ yarn test
 ```
 
 ### Rebuild contracts
 
-Note: May need to give permession
+Note: May need to give permission
 
-```sh
-./rebuild.sh
+```
+$ ./rebuild.sh
 ```

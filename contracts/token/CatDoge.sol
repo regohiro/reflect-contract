@@ -3,6 +3,7 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./ReflectiveToken.sol";
+// import "hardhat/console.sol";
 
 contract CatDoge is ReflectiveToken { 
   using EnumerableSet for EnumerableSet.AddressSet;
@@ -22,7 +23,7 @@ contract CatDoge is ReflectiveToken {
   uint256 public buyLimit;
   uint256 public sellLimit;
 
-  uint256 private immutable numTokensSellToAddToLiquidity;
+  uint256 public numTokensSellToAddToLiquidity; 
   uint256 private constant DISTRIBUTION_MULTIPLIER = 2**64;
 
   EnumerableSet.AddressSet _stakingExcluded;
@@ -36,8 +37,8 @@ contract CatDoge is ReflectiveToken {
   constructor() ReflectiveToken("CatDoge", "CATDOGE", 10**15, 3, 2, 8) {
     _tOwned[_msgSender()] = _tTotal;
 
-    // 0.03% of total supply
-    numTokensSellToAddToLiquidity = (30000 * _tTotal) / 10**8;
+    //0.0003% of total supply (was 0.03%)
+    numTokensSellToAddToLiquidity = (30000 * _tTotal) / 10**10;
 
     // 0.1% of total supply on both buy/sell initially
     buyLimit = (1000 * _tTotal) / 10**6;
@@ -168,9 +169,11 @@ contract CatDoge is ReflectiveToken {
   }
 
   function _withdraw(address account, uint256 amount) private {
-    payable(account).transfer(amount);
+    //Effects
     bnbWithdrawn[account] += amount;
     totalWithdrawn += amount;
+    //Interactions
+    WBTC.transfer(account, amount);
 
     emit OnWithdraw(account, amount);
   }
@@ -185,15 +188,15 @@ contract CatDoge is ReflectiveToken {
   }
 
   function swapAndDistribute(uint256 contractTokenBalance) private {
-    uint256 initialBalance = address(this).balance;
-    swapTokensForBnb(contractTokenBalance);
-    uint256 swappedAmount = address(this).balance - initialBalance;
+    uint256 initialBalance = WBTC.balanceOf(address(this));
+    swapTokensForWBTC(contractTokenBalance);
+    uint256 swappedAmount = WBTC.balanceOf(address(this)) - initialBalance;
 
     // Forward 10% to dev wallet
     uint256 devSplit = (swappedAmount * 10) / 100;
     uint256 amount = swappedAmount - devSplit;
 
-    payable(owner()).transfer(devSplit);
+    WBTC.transfer(owner(), devSplit);
 
     totalDistributions += amount;
 
@@ -236,7 +239,7 @@ contract CatDoge is ReflectiveToken {
     totalStaked += earnings;
   }
 
-  function withdraw() external payable {
+  function withdraw() external {
     uint256 share = dividendsOf(_msgSender());
 
     // Resetting dividends back to 0
@@ -279,10 +282,10 @@ contract CatDoge is ReflectiveToken {
 
   function withdrawIsolatedBnb() external onlyOwner {
     uint256 pendingBnb = totalDistributions - totalWithdrawn;
-    uint256 isolatedBnb = address(this).balance - pendingBnb;
+    uint256 isolatedBnb = WBTC.balanceOf(address(this))- pendingBnb;
 
     if (isolatedBnb > 0) {
-      payable(_msgSender()).transfer(isolatedBnb);
+      WBTC.transfer(_msgSender(), isolatedBnb);
 
       emit OnWithdrawIsolatedBNB(isolatedBnb);
     }
@@ -304,5 +307,9 @@ contract CatDoge is ReflectiveToken {
     require((limit <= maxLimit && limit >= minLimit) || limit == 0, "Sell limit out of bounds");
 
     sellLimit = limit;
+  }
+
+  function updateNumTokensSellToAddToLiquidity(uint256 amount) external onlyOwner {
+    numTokensSellToAddToLiquidity = amount;
   }
 }

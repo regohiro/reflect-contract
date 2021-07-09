@@ -19,6 +19,10 @@ export async function advanceBlockBy(blockAmount: number) {
   }
 }
 
+export async function advanceTime(time: number) {
+  await ethers.provider.send("evm_increaseTime", [time])
+}
+
 export async function latest() {
   const block = await ethers.provider.getBlock("latest");
   return BigNumber.from(block.timestamp);

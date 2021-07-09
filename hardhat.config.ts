@@ -35,6 +35,16 @@ const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "";
 const MORALIS_API_KEY = process.env.MORALIS_API_KEY || "";
 
+
+task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
+  const accounts = await hre.ethers.getSigners();
+
+  for (const account of accounts) {
+    console.log(account.address);
+  }
+});
+
+
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   let url: string;
 
@@ -85,6 +95,9 @@ const config: HardhatUserConfig = {
         mnemonic: MNEMONIC,
       },
       chainId: chainIds.hardhat,
+      forking: {
+        url: "https://" + "speedy-nodes-nyc.moralis.io/" + MORALIS_API_KEY + "/bsc/mainnet"
+      },
     },
     mainnet: createTestnetConfig("mainnet"),
     goerli: createTestnetConfig("goerli"),
