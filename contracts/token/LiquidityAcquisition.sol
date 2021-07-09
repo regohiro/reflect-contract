@@ -4,11 +4,10 @@ pragma solidity ^0.8.4;
 import "./uniswapv2/interfaces/IUniswapV2Pair.sol";
 import "./uniswapv2/interfaces/IUniswapV2Factory.sol";
 import "./uniswapv2/interfaces/IUniswapV2Router02.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract InternalToken {
-  // This is always expected to be 
-  // overwritten by a parent contract
   function _approve(
     address owner,
     address spender,
@@ -19,12 +18,14 @@ contract InternalToken {
 contract LiquidityAcquisition is InternalToken, Ownable {
   IUniswapV2Router02 public uniswapV2Router;
   IUniswapV2Pair public uniswapV2Pair;
+  IERC20 public immutable WBTC;
 
   constructor() {
-    IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x9Ac64Cc6e4415144C455BD8E4837Fea55603e5c3);
+    IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
     IUniswapV2Pair _uniswapV2Pair = IUniswapV2Pair(
       IUniswapV2Factory(_uniswapV2Router.factory()).createPair(address(this), _uniswapV2Router.WETH())
     );
+    WBTC = IERC20(0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c);
     uniswapV2Router = _uniswapV2Router;
     uniswapV2Pair = _uniswapV2Pair;
   }  
@@ -53,37 +54,21 @@ contract LiquidityAcquisition is InternalToken, Ownable {
     return sender == address(uniswapV2Pair);
   }
 
-  function swapTokensForBnb(uint256 tokenAmount) internal {
-    address[] memory path = new address[](2);
+  function swapTokensForWBTC(uint256 tokenAmount) internal {
+    address[] memory path = new address[](3);
     path[0] = address(this);
     path[1] = uniswapV2Router.WETH();
+    path[2] = address(WBTC);
 
     _approve(address(this), address(uniswapV2Router), tokenAmount);
 
     try
-      uniswapV2Router.swapExactTokensForETHSupportingFeeOnTransferTokens(
+      uniswapV2Router.swapExactTokensForTokensSupportingFeeOnTransferTokens(
         tokenAmount,
         0,
         path,
         address(this),
-        block.timestamp
-      )
-    {} catch Error(string memory reason) {
-      emit SwapFailure(reason);
-    }
-  }
-
-  function addLiquidity(uint256 tokenAmount, uint256 bnbAmount) internal {
-    _approve(address(this), address(uniswapV2Router), tokenAmount);
-
-    try
-      uniswapV2Router.addLiquidityETH{ value: bnbAmount }(
-        address(this),
-        tokenAmount,
-        0,
-        0,
-        address(this),
-        block.timestamp
+        block.timestamp + 5
       )
     {} catch Error(string memory reason) {
       emit SwapFailure(reason);
