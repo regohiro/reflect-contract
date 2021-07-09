@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Unlicensed
 pragma solidity ^0.8.4;
 
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./LiquidityAcquisition.sol";
+
 // import "hardhat/console.sol";
 
 contract ReflectiveERC20 is IERC20, Context, LiquidityAcquisition {
