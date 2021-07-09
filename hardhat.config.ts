@@ -85,6 +85,9 @@ const config: HardhatUserConfig = {
         mnemonic: MNEMONIC,
       },
       chainId: chainIds.hardhat,
+      forking: {
+        url: "https://" + "speedy-nodes-nyc.moralis.io/" + MORALIS_API_KEY + "/bsc/mainnet"
+      },
     },
     mainnet: createTestnetConfig("mainnet"),
     goerli: createTestnetConfig("goerli"),
