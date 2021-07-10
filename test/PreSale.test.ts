@@ -50,7 +50,7 @@ describe("CatDoge Presale Test", () => {
     await cd.excludeFromFee(cdps.address);
     await cd.excludeFromStaking(cdps.address);
 
-    const decimals = parseInt((await cd.decimals()).toString());
+    const decimals = Number(await cd.decimals());
     const toTransfer = toWei(10**15 / 2, decimals);
 
     await cd.transfer(cdps.address, toTransfer);
@@ -58,14 +58,14 @@ describe("CatDoge Presale Test", () => {
 
   describe("Buy Check", () => {
     it("Should deliver tokens to customer", async function () {
-      await advanceTime(fromSec(2000)); 
+      await advanceTime(fromSec(2000)); //advance 2000sec
 
       const toPay = toWei(0.1);
 
       await cdps.connect(users[1]).buyTokens({value: toPay});
 
       const tokenBalance = (await cd.balanceOf(usersAddr[1])).toString();
-      const decimals = parseInt((await cd.decimals()).toString());
+      const decimals = Number(await cd.decimals());
       const expectation = toWei(0.1 * (3 * 10 ** 9), decimals);
 
       expect(tokenBalance).to.be.equal(expectation);
