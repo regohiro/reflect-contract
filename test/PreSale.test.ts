@@ -38,7 +38,7 @@ describe("CatDoge Presale Test", () => {
     const rate = (3 * 10 ** 9).toString();
     const wallet = ownerAddr;
     const token = cd.address;
-    const openingTime = (Math.floor(Date.now() / 1000) + 5).toString(); //now + 5sec
+    const openingTime = (Math.floor(Date.now() / 1000) + 1000).toString(); //now + 1000sec
     const closingTime = (toUnix("12/25/2021 13:00:00")).toString();
     const caps = toBN(10);  //in BNB
     const minBuyLimit = toWei(0.01);   //in BNB 
@@ -50,7 +50,7 @@ describe("CatDoge Presale Test", () => {
     await cd.excludeFromFee(cdps.address);
     await cd.excludeFromStaking(cdps.address);
 
-    const decimals = parseInt((await cd.decimals()).toString());
+    const decimals = Number(await cd.decimals());
     const toTransfer = toWei(10**15 / 2, decimals);
 
     await cd.transfer(cdps.address, toTransfer);
@@ -58,14 +58,14 @@ describe("CatDoge Presale Test", () => {
 
   describe("Buy Check", () => {
     it("Should deliver tokens to customer", async function () {
-      await advanceTime(fromSec(60)); 
+      await advanceTime(fromSec(2000)); //advance 2000sec
 
       const toPay = toWei(0.1);
 
       await cdps.connect(users[1]).buyTokens({value: toPay});
 
       const tokenBalance = (await cd.balanceOf(usersAddr[1])).toString();
-      const decimals = parseInt((await cd.decimals()).toString());
+      const decimals = Number(await cd.decimals());
       const expectation = toWei(0.1 * (3 * 10 ** 9), decimals);
 
       expect(tokenBalance).to.be.equal(expectation);
