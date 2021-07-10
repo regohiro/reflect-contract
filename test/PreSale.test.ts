@@ -38,7 +38,7 @@ describe("CatDoge Presale Test", () => {
     const rate = (3 * 10 ** 9).toString();
     const wallet = ownerAddr;
     const token = cd.address;
-    const openingTime = (Math.floor(Date.now() / 1000) + 5).toString(); //now + 5sec
+    const openingTime = (Math.floor(Date.now() / 1000) + 1000).toString(); //now + 1000sec
     const closingTime = (toUnix("12/25/2021 13:00:00")).toString();
     const caps = toBN(10);  //in BNB
     const minBuyLimit = toWei(0.01);   //in BNB 
@@ -58,7 +58,7 @@ describe("CatDoge Presale Test", () => {
 
   describe("Buy Check", () => {
     it("Should deliver tokens to customer", async function () {
-      await advanceTime(fromSec(60)); 
+      await advanceTime(fromSec(2000)); 
 
       const toPay = toWei(0.1);
 
