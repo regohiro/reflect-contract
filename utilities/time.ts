@@ -23,6 +23,11 @@ export async function advanceTime(time: number) {
   await ethers.provider.send("evm_increaseTime", [time])
 }
 
+export async function advanceTimeAndBlock(time: number) {
+  await advanceTime(time)
+  await advanceBlock()
+}
+
 export async function latest() {
   const block = await ethers.provider.getBlock("latest");
   return BigNumber.from(block.timestamp);
@@ -31,6 +36,11 @@ export async function latest() {
 export function toUnix(strDate: string) {
   const datum = Date.parse(strDate);
   return datum / 1000;
+}
+
+export function getCurrentTime(addTime = 0){
+  const time = Math.floor(Date.now() / 1000) + addTime;
+  return time.toString();
 }
 
 export const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));

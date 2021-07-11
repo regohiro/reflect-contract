@@ -2,12 +2,13 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Context.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 // import "hardhat/console.sol";
 
-contract PreSale is Context, Ownable{
+contract PreSale is Context, Ownable, ReentrancyGuard {
   using SafeERC20 for IERC20; 
 
   // CatDoge Token
@@ -78,11 +79,15 @@ contract PreSale is Context, Ownable{
     return block.timestamp >= openingTime && block.timestamp <= closingTime;
   }
 
-  function buyTokens() external payable {
+  function getTime() external view returns(uint256){
+    return block.timestamp;
+  }
+
+  function buyTokens() external nonReentrant payable {
     address beneficiary = msg.sender; 
     uint256 weiAmount = msg.value;
 
-    // calculate token amount to transfer
+    //Calculate token amount to transfer
     uint256 tokens = (weiAmount * rate) * 10**3 / 10**18;
 
     //Checks
@@ -93,7 +98,7 @@ contract PreSale is Context, Ownable{
     contributions[beneficiary] += weiAmount;
 
     //Interactions
-    token.transfer(beneficiary, tokens);
+    token.safeTransfer(beneficiary, tokens);
     emit TokensPurchased(_msgSender(), beneficiary, weiAmount, tokens);
   }
 

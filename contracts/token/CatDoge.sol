@@ -10,7 +10,10 @@ contract CatDoge is ReflectiveToken {
 
   mapping(address => uint256) public stakeValue;
   mapping(address => uint256) public stakerPayouts;
-  mapping(address => uint256) public bnbWithdrawn;
+  mapping(address => uint256) public btcWithdrawn;
+
+  // Address where dev bBTC is collected (should be multisig)
+  address public wallet;
 
   uint256 public profitPerShare;
   uint256 public pendingShares;
@@ -29,16 +32,18 @@ contract CatDoge is ReflectiveToken {
   EnumerableSet.AddressSet _stakingExcluded;
 
   event OnWithdraw(address sender, uint256 amount);
-  event OnDistribute(uint256 tokenAmount, uint256 bnbReceived);
+  event OnDistribute(uint256 tokenAmount, uint256 btcReceived);
   event OnStakingInclude(address account);
   event OnStakingExclude(address account);
-  event OnWithdrawIsolatedBNB(uint256 amount);
+  event OnWithdrawIsolatedBTC(uint256 amount);
 
-  constructor() ReflectiveToken("CatDoge", "CATDOGE", 10**15, 3, 2, 8) {
+  //Tax: 1.5% + 13.5% = 15%
+  constructor() ReflectiveToken("CatDoge", "CATDOGE", 10**15, 3, 15, 135) { 
     _tOwned[_msgSender()] = _tTotal;
+    wallet = _msgSender();
 
-    //0.0003% of total supply (was 0.03%)
-    numTokensSellToAddToLiquidity = (30000 * _tTotal) / 10**10;
+    //0.03% of total supply 
+    numTokensSellToAddToLiquidity = (3000000 * _tTotal) / 10**10;
 
     // 0.1% of total supply on both buy/sell initially
     buyLimit = (1000 * _tTotal) / 10**6;
@@ -170,7 +175,7 @@ contract CatDoge is ReflectiveToken {
 
   function _withdraw(address account, uint256 amount) private {
     //Effects
-    bnbWithdrawn[account] += amount;
+    btcWithdrawn[account] += amount;
     totalWithdrawn += amount;
     //Interactions
     WBTC.transfer(account, amount);
@@ -196,7 +201,8 @@ contract CatDoge is ReflectiveToken {
     uint256 devSplit = (swappedAmount * 10) / 100;
     uint256 amount = swappedAmount - devSplit;
 
-    WBTC.transfer(owner(), devSplit);
+    // console.log("devSplit: %s", devSplit);
+    WBTC.transfer(wallet, devSplit);
 
     totalDistributions += amount;
 
@@ -280,36 +286,39 @@ contract CatDoge is ReflectiveToken {
     emit OnStakingExclude(account);
   }
 
-  function withdrawIsolatedBnb() external onlyOwner {
-    uint256 pendingBnb = totalDistributions - totalWithdrawn;
-    uint256 isolatedBnb = WBTC.balanceOf(address(this))- pendingBnb;
+  function withdrawIsolatedBtc() external onlyOwner {
+    uint256 pendingBtc = totalDistributions - totalWithdrawn;
+    uint256 isolatedBtc = WBTC.balanceOf(address(this))- pendingBtc;
 
-    if (isolatedBnb > 0) {
-      WBTC.transfer(_msgSender(), isolatedBnb);
+    if (isolatedBtc > 0) {
+      WBTC.transfer(wallet, isolatedBtc);
 
-      emit OnWithdrawIsolatedBNB(isolatedBnb);
+      emit OnWithdrawIsolatedBTC(isolatedBtc);
     }
   }
 
   function updateBuyLimit(uint256 limit) external onlyOwner {
     // Buy limit can only be 0.1% or disabled, set to 0 to disable
-    uint256 maxLimit = (1000 * _tTotal) / 10**6;
+    uint256 maxLimit = 1000;
     require(limit == maxLimit || limit == 0, "Buy limit out of bounds");
-
-    buyLimit = limit;
+    buyLimit = (limit * _tTotal) / 10**6;
   }
 
   function updateSellLimit(uint256 limit) external onlyOwner {
     // Min sell limit is 0.1%, max is 0.5%. Set to 0 to disable
-    uint256 minLimit = (1000 * _tTotal) / 10**6;
-    uint256 maxLimit = (5000 * _tTotal) / 10**6;
+    uint256 minLimit = 1000;
+    uint256 maxLimit = 5000;
 
     require((limit <= maxLimit && limit >= minLimit) || limit == 0, "Sell limit out of bounds");
 
-    sellLimit = limit;
+    sellLimit = (limit * _tTotal) / 10**6;
   }
 
-  function updateNumTokensSellToAddToLiquidity(uint256 amount) external onlyOwner {
-    numTokensSellToAddToLiquidity = amount;
+  function updateNumTokensSellToAddToLiquidity(uint256 rate) external onlyOwner {
+    numTokensSellToAddToLiquidity = (rate * _tTotal) / 10**10;
+  }
+
+  function updateWallet(address newWallet) external onlyOwner {
+    wallet = newWallet;
   }
 }
