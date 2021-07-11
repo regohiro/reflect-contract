@@ -15,7 +15,7 @@ const { expect } = chai;
   * user[0]: Deployer / Owner of all contracts.
   * user[1]: Team wallet. Owns 7% of total supply. Must have time lock. 
   * user[2]: Community development wallet. Owns 9% of total supply. Must have time lock.
-  * user[3]: Dev wallet. Where 10% of distributed bBTCs get collected. Should have multisig
+  * user[3]: Dev wallet. Where 10% of distributed BTCB get collected. Should have multisig
   * user[4]: Dev wallet for Presale. Where all BNBs get collected from presale. Should have multisig. 
   * user[10]: Normal user: Alice
   * user[11]: Normal user: Bob
@@ -37,7 +37,7 @@ describe("Final Test", () => {
 
   let cd: CatDoge;
   let cdps: PreSale;
-  let bbtc: IERC20;
+  let btcb: IERC20;
   let router: IUniswapV2Router02;
 
   let totalSupply: number;
@@ -49,7 +49,7 @@ describe("Final Test", () => {
 
   before(async () => {
     //Set accounts
-    const users = await ethers.getSigners();
+    users = await ethers.getSigners();
     usersAddr = users.map(_user => _user.address);
     owner = users[0];
     team = users[1];
@@ -67,9 +67,9 @@ describe("Final Test", () => {
     //Connect to pancake router contract
     const routerAddr = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
     router = await ethers.getContractAt("IUniswapV2Router02", routerAddr);
-    //Connect to bBTC contract
-    const bbtcAddr = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
-    bbtc = await ethers.getContractAt("IERC20", bbtcAddr);
+    //Connect to BTCB contract
+    const btcbAddr = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
+    btcb = await ethers.getContractAt("IERC20", btcbAddr);
 
     //Deploy CatDoge (token)
     cd = await deployer("CatDoge") as CatDoge;
@@ -324,7 +324,7 @@ describe("Final Test", () => {
     });
   });
 
-  describe("Auto bBTC test", async () => {
+  describe("Auto BTCB test", async () => {
     before(async () => {
       //Change numTokensSellToAddToLiquidity value for testing env
       await cd.updateNumTokensSellToAddToLiquidity("30000");
@@ -353,25 +353,25 @@ describe("Final Test", () => {
       }
     });
 
-    it("Token contract should have bBTC for distribution", async () => {
-      let balance = Number(await bbtc.balanceOf(cd.address));
-      // console.log(`Token contract bBTC balance from tax: ${balance}`);
+    it("Token contract should have BTCB for distribution", async () => {
+      let balance = Number(await btcb.balanceOf(cd.address));
+      // console.log(`Token contract BTCB balance from tax: ${balance}`);
       expect(balance).to.be.greaterThan(0);
     });
 
-    it("Charile should get some bBTC after withdraw", async () => {
-      //Withdraw bBTC
+    it("Charile should get some BTCB after withdraw", async () => {
+      //Withdraw BTCB
       await cd.connect(charile).withdraw();
 
-      const btcBalance = Number(await bbtc.balanceOf(charile.address));
+      const btcBalance = Number(await btcb.balanceOf(charile.address));
       const btcWithdrawn = Number(await cd.btcWithdrawn(charile.address));
-      // console.log(`Charile bbtc reward from tax: ${btcBalance}`);
+      // console.log(`Charile BTCB reward from tax: ${btcBalance}`);
       expect(btcBalance).to.be.greaterThan(0);
       expect(btcBalance).to.be.equal(btcWithdrawn);
     });
 
-    it("Dev wallet should have around 10% of bBTC reward", async () => {
-      const devBtcBalance = Number(await bbtc.balanceOf(dev.address));
+    it("Dev wallet should have around 10% of BTCB reward", async () => {
+      const devBtcBalance = Number(await btcb.balanceOf(dev.address));
       const totalDistributions = Number(await cd.totalDistributions());
       const percentage = 100 * devBtcBalance / (devBtcBalance + totalDistributions);
 

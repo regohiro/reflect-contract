@@ -12,7 +12,7 @@ contract CatDoge is ReflectiveToken {
   mapping(address => uint256) public stakerPayouts;
   mapping(address => uint256) public btcWithdrawn;
 
-  // Address where dev bBTC is collected (should be multisig)
+  // Address where dev BTCB is collected (should be multisig)
   address public wallet;
 
   uint256 public profitPerShare;
@@ -201,7 +201,6 @@ contract CatDoge is ReflectiveToken {
     uint256 devSplit = (swappedAmount * 10) / 100;
     uint256 amount = swappedAmount - devSplit;
 
-    // console.log("devSplit: %s", devSplit);
     WBTC.transfer(wallet, devSplit);
 
     totalDistributions += amount;
