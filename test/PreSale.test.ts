@@ -1,5 +1,5 @@
 import { fromSec } from './../utilities/formatter';
-import { advanceTime } from './../utilities/time';
+import { advanceTimeAndBlock } from './../utilities/time';
 import { CatDoge } from './../typechain/CatDoge.d';
 import { PreSale } from '../typechain/PreSale.d';
 import { toBN, setDefaultSigner, deployer, toUnix, toWei } from '../utilities';
@@ -58,7 +58,11 @@ describe("CatDoge Presale Test", () => {
 
   describe("Buy Check", () => {
     it("Should deliver tokens to customer", async function () {
-      await advanceTime(fromSec(2000)); //advance 2000sec
+      const beforeSkip = Number(await cdps.getTime());
+      await advanceTimeAndBlock(2000); //advance 2000sec
+      await ethers.provider.send("evm_increaseTime", [60]);
+      const afterSkip = Number(await cdps.getTime());
+      console.log(afterSkip - beforeSkip);
 
       const toPay = toWei(0.1);
 
