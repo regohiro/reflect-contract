@@ -2,9 +2,8 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "./LiquidityAcquisition.sol";
-
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 // import "hardhat/console.sol";
 
 contract ReflectiveERC20 is IERC20, Context, LiquidityAcquisition {
@@ -170,8 +169,8 @@ contract ReflectiveERC20 is IERC20, Context, LiquidityAcquisition {
     uint256 tSwap = 0;
 
     if (takeFee) {
-      tFee = (tAmount * reflectionFee) / 100;
-      tSwap = (tAmount * swapFee) / 100;
+      tFee = (tAmount * reflectionFee) / 1000;
+      tSwap = (tAmount * swapFee) / 1000;
     }
 
 
