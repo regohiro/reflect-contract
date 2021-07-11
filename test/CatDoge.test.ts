@@ -10,7 +10,7 @@ import { solidity } from "ethereum-waffle";
 chai.use(solidity);
 const { expect } = chai;
 
-describe("CatDoge Token Test", () => {
+describe.skip("CatDoge Token Test", () => {
   let usersAddr: string[];
   let users: Signer[];
   let ownerAddr: string;

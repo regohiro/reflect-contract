@@ -1,4 +1,3 @@
-import { fromSec } from './../utilities/formatter';
 import { advanceTimeAndBlock } from './../utilities/time';
 import { CatDoge } from './../typechain/CatDoge.d';
 import { PreSale } from '../typechain/PreSale.d';
@@ -11,7 +10,7 @@ import { solidity } from "ethereum-waffle";
 chai.use(solidity);
 const { expect } = chai;
 
-describe("CatDoge Presale Test", () => {
+describe.skip("CatDoge Presale Test", () => {
   let usersAddr: string[];
   let users: Signer[];
   let ownerAddr: string;
