@@ -19,13 +19,21 @@ describe("CatDoge Token Test", () => {
   let bbtc: IERC20;
   let router: IUniswapV2Router02;
 
+  /*
+   * user[0]: Deployer and owner of contract
+   * user[1]: Normal user. Owns lots of CatDoge. 
+   * user[2]: Normal user. Buys and sells CatDoge many times @Pancake
+   * user[3]: Normal user. 
+   * user[4]: Dev wallet / Team wallet. Where bBTC get collected. Should have multisig. 
+   */
+
   before(async () => {
     //Set contract accounts
     const signers = await ethers.getSigners();
     const owner = signers[0];
     ownerAddr = await owner.getAddress();
     setDefaultSigner(owner);
-    //Set user accounts (addresses)
+    //Set user accounts 
     users = signers;
     usersAddr = signers.map(_signer => _signer.address);
 
@@ -59,9 +67,22 @@ describe("CatDoge Token Test", () => {
       await router.addLiquidityETH(
         cd.address, tokenToAdd, "1", "1", ownerAddr, deadline, {value: bnbToAdd}
       );
+      //Exclude Pancake from staking; otherwise Pancake will receive rewards that can never be withdrawn!
+      await cd.excludeFromStaking(await cd.uniswapV2Pair());
+      await cd.excludeFromStaking(await cd.uniswapV2Router());
+
+      //Change numTokensSellToAddToLiquidity for testing
+      await cd.updateNumTokensSellToAddToLiquidity("30000");
     });
 
-    it("User1 should get tokens after transfer", async () => {
+    it("Only owner should be able to set dev wallet", async () => {
+      await expect(cd.connect(users[1]).updateWallet(usersAddr[4])).to.be.reverted;
+      await expect(cd.connect(users[0]).updateWallet(usersAddr[4])).to.not.be.reverted;
+
+      //This dev wallet should have multisig
+    });
+
+    it("User1 (hodler) should get tokens after transfer from owner", async () => {
       //Transfer some tokens to User1 from owner 
       const tokenToGive = toWei(5 * 10**10, 3);
       await cd.transfer(usersAddr[1], tokenToGive);
@@ -70,12 +91,13 @@ describe("CatDoge Token Test", () => {
       expect(balance.toString()).to.equal(tokenToGive);
     });
 
-    it("User3 should get tokens after swap", async () => {
+    it("User3 should be able to swap and get reasonable amount of tokens", async () => {
+      //Buy 1BNB worth of tokens
       const bnbToPay = toWei(1); //1BNB
       let path: string[] = new Array();
       path[0] = await router.WETH(); //WBNB
       path[1] = cd.address; //token
-      const deadline = (Math.floor(Date.now() / 1000) + 10).toString(); //now + 10sec
+      const deadline = (Math.floor(Date.now() / 1000) + 100).toString(); //now + 100sec
       await router.connect(users[3]).swapExactETHForTokensSupportingFeeOnTransferTokens(
         "0", path, usersAddr[3], deadline, {value: bnbToPay}
       );
@@ -84,9 +106,17 @@ describe("CatDoge Token Test", () => {
       // console.log(`User2 token balance after swap: ${balance}`);
       expect(balance).to.be.greaterThan(4 * 10**7 * 10**3); 
       expect(balance).to.be.lessThan(5 * 10**7 * 10**3);
+
+      //Sell all tokens
+      path[1] = path[0];
+      path[0] = cd.address;
+      await cd.connect(users[3]).approve(router.address, balance);
+      await router.connect(users[3]).swapExactTokensForETHSupportingFeeOnTransferTokens(
+        balance, "0", path, usersAddr[3], deadline
+      );
     });
 
-    it("Users buy and sell multiple times", async function() {
+    it("Users should be able to buy and sell multiple times", async function() {
       this.timeout(1000000); //change default timeout
 
       const bnbToSwap = toWei(2); //2BNB
@@ -100,7 +130,7 @@ describe("CatDoge Token Test", () => {
       path2[1] = await router.WETH(); //WBNB
       const deadline2 = (Math.floor(Date.now() / 1000) + 10000).toString(); 
 
-      for(let i=0; i < 250; i++){
+      for(let i=0; i < 200; i++){
         //Buy tokens
         const tx1 = await router.connect(users[2]).swapExactETHForTokensSupportingFeeOnTransferTokens(
           "0", path1, usersAddr[2], deadline1, {value: bnbToSwap}
@@ -117,13 +147,13 @@ describe("CatDoge Token Test", () => {
       }
     });
 
-    it("Token contract should have bBTC", async () => {
+    it("Token contract should have bBTC for distribution", async () => {
       let balance = Number(await bbtc.balanceOf(cd.address));
       // console.log(`Token contract bBTC balance from tax: ${balance}`);
       expect(balance).to.be.greaterThan(0);
     });
 
-    it("User1 should be rewarded for being a hodler", async () => {
+    it("User1 should be able to withdraw some bBTC for being a hodler", async () => {
       //Withdraw bBTC
       await cd.connect(users[1]).withdraw();
 
@@ -134,6 +164,24 @@ describe("CatDoge Token Test", () => {
       const tokenBalance = Number(await cd.balanceOf(usersAddr[1]));
       const tokenBalanceBefore = 5 * 10**10 * 10**3;
       expect(tokenBalance).to.be.greaterThan(tokenBalanceBefore);
+    });
+
+    it("Dev wallet should have around 10% of bBTC reward", async () => {
+      const devBtcBalance = Number(await bbtc.balanceOf(usersAddr[4]));
+      const userBtcBalance = Number(await bbtc.balanceOf(usersAddr[1]));
+      const percentage = 100 * devBtcBalance / (devBtcBalance + userBtcBalance);
+
+      expect(percentage).to.be.greaterThan(9.9);
+      expect(percentage).to.be.lessThan(10.1);
+    });
+
+    it("Owner should be able to burn tokens", async () => {
+      const toBurn = toWei(5 * 10**10, 3);
+      const burnAddr = "0x000000000000000000000000000000000000dEaD";
+      await cd.transfer(burnAddr, toBurn);
+
+      const burnAddrBalance = Number(await cd.balanceOf(burnAddr));
+      expect(burnAddrBalance).to.be.equal(5*10**10 * 10**3);
     });
   });
 });
