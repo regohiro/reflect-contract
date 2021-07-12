@@ -5,7 +5,7 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./ReflectiveToken.sol";
 // import "hardhat/console.sol";
 
-contract CatDoge is ReflectiveToken { 
+contract Token is ReflectiveToken { 
   using EnumerableSet for EnumerableSet.AddressSet;
 
   mapping(address => uint256) public stakeValue;
@@ -38,7 +38,14 @@ contract CatDoge is ReflectiveToken {
   event OnWithdrawIsolatedBTC(uint256 amount);
 
   //Tax: 1.5% + 13.5% = 15%
-  constructor() ReflectiveToken("CatDoge", "CATDOGE", 10**15, 3, 15, 135) { 
+  constructor(
+    string memory _name,
+    string memory _symbol,
+    uint256 _totalSupply,
+    uint256 _decimals,
+    uint256 _reflectionFee,
+    uint256 _swapFee
+  ) ReflectiveToken(_name, _symbol, _totalSupply, uint8(_decimals), uint8(_reflectionFee), uint8(_swapFee)) { 
     _tOwned[_msgSender()] = _tTotal;
     wallet = _msgSender();
 

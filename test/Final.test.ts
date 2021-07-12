@@ -1,7 +1,7 @@
+import { Token } from './../typechain/Token.d';
 import { PreSale } from './../typechain/PreSale.d';
 import { IERC20 } from './../typechain/IERC20.d';
 import { IUniswapV2Router02 } from './../typechain/IUniswapV2Router02.d';
-import { CatDoge } from './../typechain/CatDoge.d';
 import { toWei, deployer, setDefaultSigner, advanceTimeAndBlock, getCurrentTime } from "../utilities";
 import { ethers, waffle } from "hardhat";
 import chai from "chai";
@@ -76,7 +76,7 @@ describe("Final Test", () => {
     btcb = await ethers.getContractAt("IERC20", btcbAddr);
 
     //Deploy CatDoge (token)
-    cd = await deployer("CatDoge") as CatDoge;
+    cd = await deployer("CatDoge") as Token;
 
     //Set swap paths
     pathBuy[0] = await router.WETH();
