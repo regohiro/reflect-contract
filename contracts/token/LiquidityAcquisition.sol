@@ -32,7 +32,7 @@ contract LiquidityAcquisition is InternalToken, Ownable {
 
   event SwapFailure(string reason);
 
-  function setRouterAddress(address newRouter) public onlyOwner {
+  function setRouterAddress(address newRouter) external onlyOwner {
     IUniswapV2Router02 _newPancakeRouter = IUniswapV2Router02(newRouter);
     uniswapV2Pair = IUniswapV2Pair(
       IUniswapV2Factory(_newPancakeRouter.factory()).createPair(address(this), _newPancakeRouter.WETH())

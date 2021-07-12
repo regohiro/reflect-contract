@@ -5,14 +5,14 @@ import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./ReflectiveToken.sol";
 // import "hardhat/console.sol";
 
-contract CatDoge is ReflectiveToken { 
+contract Token is ReflectiveToken { 
   using EnumerableSet for EnumerableSet.AddressSet;
 
   mapping(address => uint256) public stakeValue;
   mapping(address => uint256) public stakerPayouts;
   mapping(address => uint256) public btcWithdrawn;
 
-  // Address where dev bBTC is collected (should be multisig)
+  // Address where dev BTCB is collected (should be multisig)
   address public wallet;
 
   uint256 public profitPerShare;
@@ -38,7 +38,14 @@ contract CatDoge is ReflectiveToken {
   event OnWithdrawIsolatedBTC(uint256 amount);
 
   //Tax: 1.5% + 13.5% = 15%
-  constructor() ReflectiveToken("CatDoge", "CATDOGE", 10**15, 3, 15, 135) { 
+  constructor(
+    string memory _name,
+    string memory _symbol,
+    uint256 _totalSupply,
+    uint256 _decimals,
+    uint256 _reflectionFee,
+    uint256 _swapFee
+  ) ReflectiveToken(_name, _symbol, _totalSupply, uint8(_decimals), uint8(_reflectionFee), uint8(_swapFee)) { 
     _tOwned[_msgSender()] = _tTotal;
     wallet = _msgSender();
 
@@ -201,7 +208,6 @@ contract CatDoge is ReflectiveToken {
     uint256 devSplit = (swappedAmount * 10) / 100;
     uint256 amount = swappedAmount - devSplit;
 
-    // console.log("devSplit: %s", devSplit);
     WBTC.transfer(wallet, devSplit);
 
     totalDistributions += amount;

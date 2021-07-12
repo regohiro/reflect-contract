@@ -1,7 +1,7 @@
-import { PreSale } from './../typechain/PreSale.d';
+import { Presale } from './../typechain/Presale.d';
+import { Token } from './../typechain/Token.d';
 import { IERC20 } from './../typechain/IERC20.d';
 import { IUniswapV2Router02 } from './../typechain/IUniswapV2Router02.d';
-import { CatDoge } from './../typechain/CatDoge.d';
 import { toWei, deployer, setDefaultSigner, advanceTimeAndBlock, getCurrentTime } from "../utilities";
 import { ethers, waffle } from "hardhat";
 import chai from "chai";
@@ -15,11 +15,13 @@ const { expect } = chai;
   * user[0]: Deployer / Owner of all contracts.
   * user[1]: Team wallet. Owns 7% of total supply. Must have time lock. 
   * user[2]: Community development wallet. Owns 9% of total supply. Must have time lock.
-  * user[3]: Dev wallet. Where 10% of distributed bBTCs get collected. Should have multisig
+  * user[3]: Dev wallet. Where 10% of distributed BTCB get collected. Should have multisig
   * user[4]: Dev wallet for Presale. Where all BNBs get collected from presale. Should have multisig. 
   * user[10]: Normal user: Alice
   * user[11]: Normal user: Bob
   * user[12]: Normal user: Charile
+  * user[13]: Normals user: David
+  * user[14]: Normals user: Eric
   */
 
 describe("Final Test", () => {
@@ -33,11 +35,12 @@ describe("Final Test", () => {
   let bob: SignerWithAddress;
   let charile: SignerWithAddress;
   let david: SignerWithAddress;
+  let eric: SignerWithAddress;
   let usersAddr: string[];
 
-  let cd: CatDoge;
-  let cdps: PreSale;
-  let bbtc: IERC20;
+  let cd: Token;
+  let cdps: Presale;
+  let btcb: IERC20;
   let router: IUniswapV2Router02;
 
   let totalSupply: number;
@@ -49,7 +52,7 @@ describe("Final Test", () => {
 
   before(async () => {
     //Set accounts
-    const users = await ethers.getSigners();
+    users = await ethers.getSigners();
     usersAddr = users.map(_user => _user.address);
     owner = users[0];
     team = users[1];
@@ -60,6 +63,7 @@ describe("Final Test", () => {
     bob = users[11];
     charile = users[12];
     david = users[13];
+    eric = users[14];
 
     //Set default signer 
     setDefaultSigner(owner);
@@ -67,12 +71,20 @@ describe("Final Test", () => {
     //Connect to pancake router contract
     const routerAddr = "0x10ED43C718714eb63d5aA57B78B54704E256024E";
     router = await ethers.getContractAt("IUniswapV2Router02", routerAddr);
-    //Connect to bBTC contract
-    const bbtcAddr = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
-    bbtc = await ethers.getContractAt("IERC20", bbtcAddr);
+    //Connect to BTCB contract
+    const btcbAddr = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
+    btcb = await ethers.getContractAt("IERC20", btcbAddr);
+
+    //Set Token contract args
+    const name = "CatDoge";
+    const symbol = "CATDOGE";
+    const totalSupply = (10**15).toString(); //NO DECIMAL
+    const decimals = "3";
+    const reflectionFee = "15";
+    const swapFee = "135";
 
     //Deploy CatDoge (token)
-    cd = await deployer("CatDoge") as CatDoge;
+    cd = await deployer("Token", name, symbol, totalSupply, decimals, reflectionFee, swapFee) as Token;
 
     //Set swap paths
     pathBuy[0] = await router.WETH();
@@ -80,7 +92,7 @@ describe("Final Test", () => {
     pathSell[0] = cd.address;
     pathSell[1] = await router.WETH();
 
-    //Set Presale args
+    //Set Presale contract args
     rate = (8 * 10 ** 11); //1BNB = 8x10^11 tokens
     const _rate = rate.toString();
     const wallet = presaleWallet.address;
@@ -91,7 +103,7 @@ describe("Final Test", () => {
     const minBuyLimit = toWei(0.01);   //in BNB 
 
     //Deploy Presale
-    cdps = (await deployer("PreSale", _rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as PreSale;
+    cdps = (await deployer("Presale", _rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as Presale;
   });
 
   describe("Basic token test", async () => {
@@ -100,7 +112,7 @@ describe("Final Test", () => {
   
       expect(await cd.name()).to.equal("CatDoge");
       expect(await cd.symbol()).to.equal("CATDOGE");
-      expect(totalSupply).to.be.equal(10**15 * 10**3);
+      expect(totalSupply).to.equal(10**15 * 10**3);
     });
   
     it("Community wallet should get 9% and team wallet should get 7% of totalsupply", async () => {
@@ -110,19 +122,19 @@ describe("Final Test", () => {
       await cd.transfer(community.address, communityFund.toString());
       await cd.transfer(team.address, teamFund.toString());
   
-      expect(Number(await cd.balanceOf(community.address))).to.be.equal(communityFund);
-      expect(Number(await cd.balanceOf(team.address))).to.be.equal(teamFund);
+      expect(Number(await cd.balanceOf(community.address))).to.equal(communityFund);
+      expect(Number(await cd.balanceOf(team.address))).to.equal(teamFund);
     });
   
     it("Presale contract should get 25% of totalsupply", async () => {
       const presaleFund = totalSupply * 25 / 100;
       await cd.transfer(cdps.address, presaleFund.toString());
-      expect(Number(await cd.balanceOf(cdps.address))).to.be.equal(presaleFund);
+      expect(Number(await cd.balanceOf(cdps.address))).to.equal(presaleFund);
     }); 
   
     it("After the initial transfers, owner should be left with 59% of totalsupply", async () => {
       const expectation = totalSupply * 59 / 100;
-      expect(Number(await cd.balanceOf(owner.address))).to.be.equal(expectation);
+      expect(Number(await cd.balanceOf(owner.address))).to.equal(expectation);
     });
   
     it("Only owner should be able to exclude accounts from staking + fee", async () => {
@@ -146,7 +158,7 @@ describe("Final Test", () => {
       await expect(cd.connect(owner).updateWallet(dev.address)).to.not.be.reverted;
   
       const devWallet = (await cd.wallet()).toString();
-      expect(devWallet).to.be.equal(dev.address);
+      expect(devWallet).to.equal(dev.address);
     });
   });
 
@@ -200,7 +212,7 @@ describe("Final Test", () => {
   
         const tokenBalance = Number(await cd.balanceOf(alice.address));
         const expectation =  toPay * rate * 10**3;
-        await expect(tokenBalance).to.be.equal(expectation);
+        await expect(tokenBalance).to.equal(expectation);
       });
   
       it("Users should not be able to buy tokens less than 0.01BNB in value", async () => {
@@ -250,7 +262,7 @@ describe("Final Test", () => {
         const toPay = 0.1;
         const tokenExpectation = presaleFund - toPay * rate * 10**3;
 
-        expect(tokenBalance).to.be.equal(tokenExpectation);
+        expect(tokenBalance).to.equal(tokenExpectation);
       });
 
       it("Presale wallet should have BNB after withdraw", async () => {
@@ -261,7 +273,7 @@ describe("Final Test", () => {
         const bnbWithdrawn = bnbBalanceAfter.sub(bnbBalanceBefore);
         const bnbExpectation = 0.1 * 10**18;
 
-        expect(Number(bnbWithdrawn)).to.be.equal(bnbExpectation);
+        expect(Number(bnbWithdrawn)).to.equal(bnbExpectation);
       });
     });
   });
@@ -275,7 +287,33 @@ describe("Final Test", () => {
       cd.connect(presaleWallet).transfer(charile.address, leftover);
     });
 
-    describe("Before providing liquidty", async () => {
+    describe("Before enabling swapping", async () => {
+      it("Users should not be able to swap tokens", async () => {
+        const tokensToSell = toWei(0.0001 * 6.5 * 10**11, 3); //0.0001BNB worth of tokens
+
+        await cd.connect(charile).approve(router.address, tokensToSell);
+        await expect(
+          router.connect(charile).swapExactTokensForETHSupportingFeeOnTransferTokens(tokensToSell, "0", pathSell, charile.address, deadlineLong)
+        ).to.be.reverted;
+      });
+
+      it("Users should not be able to add liquidty", async () => {
+        const tokenToAdd = toWei(1.625 * 10**13, 3); //1.625x10^13 tokens
+        const bnbToAdd = toWei(25); //25BNB
+
+        await cd.connect(charile).approve(router.address, tokenToAdd);
+        await expect(router.connect(charile).addLiquidityETH(
+          cd.address, tokenToAdd, "1", "1", charile.address, deadlineLong, {value: bnbToAdd}
+        )).to.be.reverted;
+      });
+    });
+
+    describe("Swapping enabled but low liquidty", async () => {
+      it("Only owner should be able to enable swapping", async () => {
+        await expect(cd.connect(alice).setSwap(true)).to.be.reverted;
+        await expect(cd.connect(owner).setSwap(true)).to.not.be.reverted;
+      });
+
       it("Users should not be able to dump (10% slippage)", async () => {
         const tokensToSell = toWei(1 * 6.5 * 10**11, 3); //1BNB worth of tokens
 
@@ -324,7 +362,7 @@ describe("Final Test", () => {
     });
   });
 
-  describe("Auto bBTC test", async () => {
+  describe("Auto BTCB test", async () => {
     before(async () => {
       //Change numTokensSellToAddToLiquidity value for testing env
       await cd.updateNumTokensSellToAddToLiquidity("30000");
@@ -353,25 +391,25 @@ describe("Final Test", () => {
       }
     });
 
-    it("Token contract should have bBTC for distribution", async () => {
-      let balance = Number(await bbtc.balanceOf(cd.address));
-      // console.log(`Token contract bBTC balance from tax: ${balance}`);
+    it("Token contract should have BTCB for distribution", async () => {
+      let balance = Number(await btcb.balanceOf(cd.address));
+      // console.log(`Token contract BTCB balance from tax: ${balance}`);
       expect(balance).to.be.greaterThan(0);
     });
 
-    it("Charile should get some bBTC after withdraw", async () => {
-      //Withdraw bBTC
+    it("Charile should get some BTCB after withdraw", async () => {
+      //Withdraw BTCB
       await cd.connect(charile).withdraw();
 
-      const btcBalance = Number(await bbtc.balanceOf(charile.address));
+      const btcBalance = Number(await btcb.balanceOf(charile.address));
       const btcWithdrawn = Number(await cd.btcWithdrawn(charile.address));
-      // console.log(`Charile bbtc reward from tax: ${btcBalance}`);
+      // console.log(`Charile BTCB reward from tax: ${btcBalance}`);
       expect(btcBalance).to.be.greaterThan(0);
-      expect(btcBalance).to.be.equal(btcWithdrawn);
+      expect(btcBalance).to.equal(btcWithdrawn);
     });
 
-    it("Dev wallet should have around 10% of bBTC reward", async () => {
-      const devBtcBalance = Number(await bbtc.balanceOf(dev.address));
+    it("Dev wallet should have around 10% of BTCB reward", async () => {
+      const devBtcBalance = Number(await btcb.balanceOf(dev.address));
       const totalDistributions = Number(await cd.totalDistributions());
       const percentage = 100 * devBtcBalance / (devBtcBalance + totalDistributions);
 
@@ -392,16 +430,50 @@ describe("Final Test", () => {
       const stakeValue = await cd.stakeValue(charile.address);;
       const balance = await cd.balanceOf(charile.address);
 
-      expect(stakeValue).to.be.equal(balance);
+      expect(stakeValue).to.equal(balance);
     });
+  });
 
-    it("Owner should be able to burn tokens", async () => {
+  describe("Transfer test", async () => {
+    it("Tokens can be burned", async () => {
       const toBurn = toWei(5 * 10**10, 3);
       const burnAddr = "0x000000000000000000000000000000000000dEaD";
       await cd.transfer(burnAddr, toBurn);
 
       const burnAddrBalance = Number(await cd.balanceOf(burnAddr));
-      expect(burnAddrBalance).to.be.equal(5*10**10 * 10**3);
+      expect(burnAddrBalance).to.equal(5*10**10 * 10**3);
+    });
+
+    it("Users should be able to transfer even if swapping is set to false", async () => {
+      await cd.setSwap(false);
+      const toTransfer = (await cd.balanceOf(alice.address)).div(4);
+      await expect(cd.connect(alice).transfer(charile.address, toTransfer)).to.not.be.reverted;
+    });
+
+    describe("When transfer tax is false", () => {
+      it("Recipient should be receive exact amount as transfer amount", async () => {
+        const toTransfer = (await cd.balanceOf(charile.address)).div(4);
+        await cd.connect(charile).transfer(david.address, toTransfer);
+  
+        const davidBalance = await cd.balanceOf(david.address);
+        expect(davidBalance).to.equal(toTransfer);
+      });
+    });
+
+    describe("When transfer tax is true", async () => {
+      it("Only owner can set tranfer tax to true", async () => {
+        await expect(cd.connect(alice).setTranferTax(true)).to.be.reverted;
+        await expect(cd.connect(owner).setTranferTax(true)).to.not.be.reverted;
+      });
+  
+      it("Recipient should receive less tokens than transfer amount", async () => {
+        const toTransfer = (await cd.balanceOf(charile.address)).div(4);
+        await cd.connect(charile).transfer(eric.address, toTransfer);
+  
+        const ericBalance = await cd.balanceOf(eric.address);
+        const _toTransfer = parseInt(toTransfer.toString());
+        expect(Number(ericBalance.toString())).to.be.within(_toTransfer * 0.8, _toTransfer * 0.9);
+      });
     });
   });
 });
