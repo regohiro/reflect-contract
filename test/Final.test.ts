@@ -100,7 +100,7 @@ describe("Final Test", () => {
   
       expect(await cd.name()).to.equal("CatDoge");
       expect(await cd.symbol()).to.equal("CATDOGE");
-      expect(totalSupply).to.be.equal(10**15 * 10**3);
+      expect(totalSupply).to.equal(10**15 * 10**3);
     });
   
     it("Community wallet should get 9% and team wallet should get 7% of totalsupply", async () => {
@@ -110,19 +110,19 @@ describe("Final Test", () => {
       await cd.transfer(community.address, communityFund.toString());
       await cd.transfer(team.address, teamFund.toString());
   
-      expect(Number(await cd.balanceOf(community.address))).to.be.equal(communityFund);
-      expect(Number(await cd.balanceOf(team.address))).to.be.equal(teamFund);
+      expect(Number(await cd.balanceOf(community.address))).to.equal(communityFund);
+      expect(Number(await cd.balanceOf(team.address))).to.equal(teamFund);
     });
   
     it("Presale contract should get 25% of totalsupply", async () => {
       const presaleFund = totalSupply * 25 / 100;
       await cd.transfer(cdps.address, presaleFund.toString());
-      expect(Number(await cd.balanceOf(cdps.address))).to.be.equal(presaleFund);
+      expect(Number(await cd.balanceOf(cdps.address))).to.equal(presaleFund);
     }); 
   
     it("After the initial transfers, owner should be left with 59% of totalsupply", async () => {
       const expectation = totalSupply * 59 / 100;
-      expect(Number(await cd.balanceOf(owner.address))).to.be.equal(expectation);
+      expect(Number(await cd.balanceOf(owner.address))).to.equal(expectation);
     });
   
     it("Only owner should be able to exclude accounts from staking + fee", async () => {
@@ -146,7 +146,7 @@ describe("Final Test", () => {
       await expect(cd.connect(owner).updateWallet(dev.address)).to.not.be.reverted;
   
       const devWallet = (await cd.wallet()).toString();
-      expect(devWallet).to.be.equal(dev.address);
+      expect(devWallet).to.equal(dev.address);
     });
   });
 
@@ -200,7 +200,7 @@ describe("Final Test", () => {
   
         const tokenBalance = Number(await cd.balanceOf(alice.address));
         const expectation =  toPay * rate * 10**3;
-        await expect(tokenBalance).to.be.equal(expectation);
+        await expect(tokenBalance).to.equal(expectation);
       });
   
       it("Users should not be able to buy tokens less than 0.01BNB in value", async () => {
@@ -250,7 +250,7 @@ describe("Final Test", () => {
         const toPay = 0.1;
         const tokenExpectation = presaleFund - toPay * rate * 10**3;
 
-        expect(tokenBalance).to.be.equal(tokenExpectation);
+        expect(tokenBalance).to.equal(tokenExpectation);
       });
 
       it("Presale wallet should have BNB after withdraw", async () => {
@@ -261,7 +261,7 @@ describe("Final Test", () => {
         const bnbWithdrawn = bnbBalanceAfter.sub(bnbBalanceBefore);
         const bnbExpectation = 0.1 * 10**18;
 
-        expect(Number(bnbWithdrawn)).to.be.equal(bnbExpectation);
+        expect(Number(bnbWithdrawn)).to.equal(bnbExpectation);
       });
     });
   });
@@ -367,7 +367,7 @@ describe("Final Test", () => {
       const btcWithdrawn = Number(await cd.btcWithdrawn(charile.address));
       // console.log(`Charile BTCB reward from tax: ${btcBalance}`);
       expect(btcBalance).to.be.greaterThan(0);
-      expect(btcBalance).to.be.equal(btcWithdrawn);
+      expect(btcBalance).to.equal(btcWithdrawn);
     });
 
     it("Dev wallet should have around 10% of BTCB reward", async () => {
@@ -392,7 +392,7 @@ describe("Final Test", () => {
       const stakeValue = await cd.stakeValue(charile.address);;
       const balance = await cd.balanceOf(charile.address);
 
-      expect(stakeValue).to.be.equal(balance);
+      expect(stakeValue).to.equal(balance);
     });
 
     it("Owner should be able to burn tokens", async () => {
@@ -401,7 +401,7 @@ describe("Final Test", () => {
       await cd.transfer(burnAddr, toBurn);
 
       const burnAddrBalance = Number(await cd.balanceOf(burnAddr));
-      expect(burnAddrBalance).to.be.equal(5*10**10 * 10**3);
+      expect(burnAddrBalance).to.equal(5*10**10 * 10**3);
     });
   });
 });
