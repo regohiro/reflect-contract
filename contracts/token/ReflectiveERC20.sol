@@ -26,6 +26,7 @@ contract ReflectiveERC20 is IERC20, Context, LiquidityAcquisition {
   uint8 public swapFee;
 
   bool public tranferTax = false;
+  bool public swapping = false;
 
   constructor(
     string memory name_,
@@ -56,11 +57,11 @@ contract ReflectiveERC20 is IERC20, Context, LiquidityAcquisition {
    * Base ERC20 Functions
    */
 
-  function name() public view returns (string memory) {
+  function name() external view returns (string memory) {
     return _name;
   }
 
-  function symbol() public view returns (string memory) {
+  function symbol() external view returns (string memory) {
     return _symbol;
   }
 
@@ -212,5 +213,9 @@ contract ReflectiveERC20 is IERC20, Context, LiquidityAcquisition {
 
   function setTranferTax(bool input) external onlyOwner {
     tranferTax = input;
+  }
+
+  function setSwap(bool input) external onlyOwner {
+    swapping = input;
   }
 }

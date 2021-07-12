@@ -3,7 +3,7 @@ pragma solidity ^0.8.4;
 
 import "./ReflectiveERC20.sol";
 import "./LiquidityAcquisition.sol";
-import "hardhat/console.sol";
+// import "hardhat/console.sol";
  
 contract ReflectiveToken is ReflectiveERC20 {
   constructor(
@@ -27,12 +27,15 @@ contract ReflectiveToken is ReflectiveERC20 {
     require(amount > 0, "Transfer amount must be greater than zero");
 
     bool takeFee = true;
+    bool isBuy = _isBuy(sender);
+    bool isSell = _isSell(sender, recipient);
 
-    bool notTaxedFromTransfer = !tranferTax && (_isBuy(sender) == _isSell(sender, recipient));
+    bool notTaxedFromTransfer = !tranferTax && (isBuy == isSell);
 
     if (_isExcludedFromFee[sender] || _isExcludedFromFee[recipient] || notTaxedFromTransfer) {
       takeFee = false;
     } else {
+      require((isBuy == isSell) || swapping, "ERC20: Not allowed to swap right now");
       _checkSwapViability(sender);
     }
 

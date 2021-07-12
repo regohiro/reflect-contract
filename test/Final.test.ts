@@ -279,8 +279,8 @@ describe("Final Test", () => {
       cd.connect(presaleWallet).transfer(charile.address, leftover);
     });
 
-    describe("Before providing liquidty", async () => {
-      it("Users should not be able to dump (10% slippage)", async () => {
+    describe("Before providing liquidty (Before enabling swapping)", async () => {
+      it.skip("Users should not be able to dump (10% slippage)", async () => {
         const tokensToSell = toWei(1 * 6.5 * 10**11, 3); //1BNB worth of tokens
 
         await cd.connect(charile).approve(router.address, tokensToSell);
@@ -289,13 +289,32 @@ describe("Final Test", () => {
         )).to.be.reverted;
       });
   
-      it("Users should not be able to sell even 0.01BNB worth of tokens (10% slippage)", async () => {
+      it.skip("Users should not be able to sell even 0.01BNB worth of tokens (10% slippage)", async () => {
         const tokensToSell = toWei(0.01 * 6.5 * 10**11, 3); //0.01BNB worth of tokens
   
         await cd.connect(charile).approve(router.address, tokensToSell);
         await expect(
           router.connect(charile).swapExactTokensForETHSupportingFeeOnTransferTokens(tokensToSell, "0.009", pathSell, charile.address, deadlineLong)
         ).to.be.reverted;
+      });
+
+      it("Users should not be able to swap tokens", async () => {
+        const tokensToSell = toWei(0.0001 * 6.5 * 10**11, 3); //0.0001BNB worth of tokens
+
+        await cd.connect(charile).approve(router.address, tokensToSell);
+        await expect(
+          router.connect(charile).swapExactTokensForETHSupportingFeeOnTransferTokens(tokensToSell, "0", pathSell, charile.address, deadlineLong)
+        ).to.be.reverted;
+      });
+
+      it("Users should not be able to add liquidty", async () => {
+        const tokenToAdd = toWei(1.625 * 10**13, 3); //1.625x10^13 tokens
+        const bnbToAdd = toWei(25); //25BNB
+
+        await cd.connect(charile).approve(router.address, tokenToAdd);
+        await expect(router.connect(charile).addLiquidityETH(
+          cd.address, tokenToAdd, "1", "1", charile.address, deadlineLong, {value: bnbToAdd}
+        )).to.be.reverted;
       });
     });
 
@@ -308,6 +327,11 @@ describe("Final Test", () => {
         await router.addLiquidityETH(
           cd.address, tokenToAdd, "1", "1", owner.address, deadlineLong, {value: bnbToAdd}
         );
+      });
+
+      it("Only owner should be able to enable swapping", async () => {
+        await expect(cd.connect(alice).setSwap(true)).to.be.reverted;
+        await expect(cd.connect(owner).setSwap(true)).to.not.be.reverted;
       });
 
       it("Users should be able to sell some now", async () => {
@@ -401,13 +425,19 @@ describe("Final Test", () => {
   });
 
   describe("Transfer test", async () => {
-    it("Owner should be able to burn tokens", async () => {
+    it("Tokens can be burned", async () => {
       const toBurn = toWei(5 * 10**10, 3);
       const burnAddr = "0x000000000000000000000000000000000000dEaD";
       await cd.transfer(burnAddr, toBurn);
 
       const burnAddrBalance = Number(await cd.balanceOf(burnAddr));
       expect(burnAddrBalance).to.equal(5*10**10 * 10**3);
+    });
+
+    it("Users should be able to transfer even if swapping is set to false", async () => {
+      await cd.setSwap(false);
+      const toTransfer = (await cd.balanceOf(alice.address)).div(4);
+      await expect(cd.connect(alice).transfer(charile.address, toTransfer)).to.not.be.reverted;
     });
 
     describe("When transfer tax is false", () => {
@@ -426,7 +456,7 @@ describe("Final Test", () => {
         await expect(cd.connect(owner).setTranferTax(true)).to.not.be.reverted;
       });
   
-      it("Recipient should be receive less tokens than transfer amount", async () => {
+      it("Recipient should receive less tokens than transfer amount", async () => {
         const toTransfer = (await cd.balanceOf(charile.address)).div(4);
         await cd.connect(charile).transfer(eric.address, toTransfer);
   
