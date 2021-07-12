@@ -33,6 +33,7 @@ describe("Final Test", () => {
   let bob: SignerWithAddress;
   let charile: SignerWithAddress;
   let david: SignerWithAddress;
+  let eric: SignerWithAddress;
   let usersAddr: string[];
 
   let cd: CatDoge;
@@ -60,6 +61,7 @@ describe("Final Test", () => {
     bob = users[11];
     charile = users[12];
     david = users[13];
+    eric = users[14];
 
     //Set default signer 
     setDefaultSigner(owner);
@@ -394,7 +396,9 @@ describe("Final Test", () => {
 
       expect(stakeValue).to.equal(balance);
     });
+  });
 
+  describe("Transfer test", async () => {
     it("Owner should be able to burn tokens", async () => {
       const toBurn = toWei(5 * 10**10, 3);
       const burnAddr = "0x000000000000000000000000000000000000dEaD";
@@ -402,6 +406,32 @@ describe("Final Test", () => {
 
       const burnAddrBalance = Number(await cd.balanceOf(burnAddr));
       expect(burnAddrBalance).to.equal(5*10**10 * 10**3);
+    });
+
+    describe("When transfer tax is false", () => {
+      it("Recipient should be receive exact amount as transfer amount", async () => {
+        const toTransfer = (await cd.balanceOf(charile.address)).div(4);
+        await cd.connect(charile).transfer(david.address, toTransfer);
+  
+        const davidBalance = await cd.balanceOf(david.address);
+        expect(davidBalance).to.equal(toTransfer);
+      });
+    });
+
+    describe("When transfer tax is true", async () => {
+      it("Only owner can set tranfer tax to true", async () => {
+        await expect(cd.connect(alice).setTranferTax(true)).to.be.reverted;
+        await expect(cd.connect(owner).setTranferTax(true)).to.not.be.reverted;
+      });
+  
+      it("Recipient should be receive less tokens than transfer amount", async () => {
+        const toTransfer = (await cd.balanceOf(charile.address)).div(4);
+        await cd.connect(charile).transfer(eric.address, toTransfer);
+  
+        const ericBalance = await cd.balanceOf(eric.address);
+        const _toTransfer = parseInt(toTransfer.toString());
+        expect(Number(ericBalance.toString())).to.be.within(_toTransfer * 0.8, _toTransfer * 0.9);
+      });
     });
   });
 });
