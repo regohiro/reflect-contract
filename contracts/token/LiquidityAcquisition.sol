@@ -16,9 +16,9 @@ contract InternalToken {
 }
 
 contract LiquidityAcquisition is InternalToken, Ownable {
-  IUniswapV2Router02 private uniswapV2Router;
-  IUniswapV2Pair private uniswapV2Pair;
-  IERC20 private immutable WBTC;
+  IUniswapV2Router02 public uniswapV2Router;
+  IUniswapV2Pair public uniswapV2Pair;
+  IERC20 public immutable WBTC;
 
   constructor() {
     IUniswapV2Router02 _uniswapV2Router = IUniswapV2Router02(0x10ED43C718714eb63d5aA57B78B54704E256024E);
