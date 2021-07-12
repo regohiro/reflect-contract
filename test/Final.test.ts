@@ -20,6 +20,8 @@ const { expect } = chai;
   * user[10]: Normal user: Alice
   * user[11]: Normal user: Bob
   * user[12]: Normal user: Charile
+  * user[13]: Normals user: David
+  * user[14]: Normals user: Eric
   */
 
 describe("Final Test", () => {
