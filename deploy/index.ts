@@ -1,17 +1,10 @@
-import { PreSale } from '../typechain/PreSale.d';
-import { CatDoge } from '../typechain/CatDoge';
+import { Presale } from './../typechain/Presale.d';
+import { Token } from './../typechain/Token.d';
 import { ethers } from "hardhat";
 import { toBN, setDefaultSigner, deployer, deployToLiveNetwork, verify, toUnix, toWei } from '../utilities';
 
-/*
-* About: deployer() function
-* @param contractName Name of the contract to deploy
-* @param [] Arguments of contract constructor
-* @return contract Instance of contract (but not typed!)
-*/
-
 async function main() {
-  //When called, it will print receipt and verify to Etherscan
+  //When called, it will print receipt and verify to BscScan
   deployToLiveNetwork();
 
   //Set contract signer (owner)
@@ -19,21 +12,29 @@ async function main() {
   const owner = signers[0];
   const ownerAddr = await owner.getAddress();
   setDefaultSigner(owner);
-  
-  //Deploy CatDoge
-  const cd = (await deployer("CatDoge")) as CatDoge;
 
-  //Set CatDoge Presale args
-  const rate = (3 * 10 ** 9).toString(); //1BNB = ? CatDoge
+  //Set Token contract args
+  const name = "CatDoge";
+  const symbol = "CATDOGE";
+  const totalSupply = (10**15).toString(); //NO DECIMAL
+  const decimals = "3";
+  const reflectionFee = "15";
+  const swapFee = "135";
+
+  //Deploy CatDoge (token)
+  const cd = await deployer("Token", name, symbol, totalSupply, decimals, reflectionFee, swapFee) as Token;
+
+  //Set Presale contract args
+  const rate = (3 * 10 ** 9).toString(); //1BNB = ? tokens
   const wallet = ownerAddr;
   const token = cd.address;
   const openingTime = (toUnix("7/8/2021 20:25:00")).toString();
   const closingTime = (toUnix("7/8/2021 21:00:00")).toString();
-  const caps = toBN(10);  //in BNB
+  const caps = toBN(3);  //in BNB
   const minBuyLimit = toWei(0.01);   //in BNB 
 
-  //Deploy CatDogePreSale
-  const cdps = (await deployer("PreSale", rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as PreSale;
+  //Deploy Presale Contract
+  const cdps = (await deployer("Presale", rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as Presale;
 }
 
 //Excute deploy

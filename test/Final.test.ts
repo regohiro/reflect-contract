@@ -1,5 +1,5 @@
+import { Presale } from './../typechain/Presale.d';
 import { Token } from './../typechain/Token.d';
-import { PreSale } from './../typechain/PreSale.d';
 import { IERC20 } from './../typechain/IERC20.d';
 import { IUniswapV2Router02 } from './../typechain/IUniswapV2Router02.d';
 import { toWei, deployer, setDefaultSigner, advanceTimeAndBlock, getCurrentTime } from "../utilities";
@@ -38,8 +38,8 @@ describe("Final Test", () => {
   let eric: SignerWithAddress;
   let usersAddr: string[];
 
-  let cd: CatDoge;
-  let cdps: PreSale;
+  let cd: Token;
+  let cdps: Presale;
   let btcb: IERC20;
   let router: IUniswapV2Router02;
 
@@ -75,8 +75,16 @@ describe("Final Test", () => {
     const btcbAddr = "0x7130d2A12B9BCbFAe4f2634d864A1Ee1Ce3Ead9c";
     btcb = await ethers.getContractAt("IERC20", btcbAddr);
 
+    //Set Token contract args
+    const name = "CatDoge";
+    const symbol = "CATDOGE";
+    const totalSupply = (10**15).toString(); //NO DECIMAL
+    const decimals = "3";
+    const reflectionFee = "15";
+    const swapFee = "135";
+
     //Deploy CatDoge (token)
-    cd = await deployer("CatDoge") as Token;
+    cd = await deployer("Token", name, symbol, totalSupply, decimals, reflectionFee, swapFee) as Token;
 
     //Set swap paths
     pathBuy[0] = await router.WETH();
@@ -84,7 +92,7 @@ describe("Final Test", () => {
     pathSell[0] = cd.address;
     pathSell[1] = await router.WETH();
 
-    //Set Presale args
+    //Set Presale contract args
     rate = (8 * 10 ** 11); //1BNB = 8x10^11 tokens
     const _rate = rate.toString();
     const wallet = presaleWallet.address;
@@ -95,7 +103,7 @@ describe("Final Test", () => {
     const minBuyLimit = toWei(0.01);   //in BNB 
 
     //Deploy Presale
-    cdps = (await deployer("PreSale", _rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as PreSale;
+    cdps = (await deployer("Presale", _rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as Presale;
   });
 
   describe("Basic token test", async () => {

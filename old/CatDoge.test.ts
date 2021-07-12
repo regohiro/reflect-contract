@@ -1,6 +1,6 @@
 import { IERC20 } from './../typechain/IERC20.d';
 import { IUniswapV2Router02 } from './../typechain/IUniswapV2Router02.d';
-import { CatDoge } from './../typechain/CatDoge.d';
+import { Token } from './../typechain/Token.d';
 import { Signer } from 'ethers';
 import { toWei, deployer, setDefaultSigner } from "../utilities";
 import { ethers, waffle } from "hardhat";
@@ -15,7 +15,7 @@ describe.skip("CatDoge Token Test", () => {
   let users: Signer[];
   let ownerAddr: string;
 
-  let cd: CatDoge;
+  let cd: Token;
   let bbtc: IERC20;
   let router: IUniswapV2Router02;
 
@@ -45,7 +45,7 @@ describe.skip("CatDoge Token Test", () => {
     bbtc = await ethers.getContractAt("IERC20", bbtcAddr);
 
     //Deploy CatDoge (token)
-    cd = await deployer("CatDoge") as CatDoge;
+    cd = await deployer("CatDoge") as Token;
   });
 
   it("Should display metadata and basic info correctly", async () => {

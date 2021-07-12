@@ -1,6 +1,6 @@
 import { advanceTimeAndBlock } from './../utilities/time';
-import { CatDoge } from './../typechain/CatDoge.d';
-import { PreSale } from '../typechain/PreSale.d';
+import { Presale } from './../typechain/Presale.d';
+import { Token } from './../typechain/Token.d';
 import { toBN, setDefaultSigner, deployer, toUnix, toWei } from '../utilities';
 import { Signer } from 'ethers';
 import { ethers, waffle } from "hardhat";
@@ -15,8 +15,8 @@ describe.skip("CatDoge Presale Test", () => {
   let users: Signer[];
   let ownerAddr: string;
 
-  let cd: CatDoge;
-  let cdps: PreSale;
+  let cd: Token;
+  let cdps: Presale;
 
   before(async () => {
     //Set contract accounts
@@ -31,7 +31,7 @@ describe.skip("CatDoge Presale Test", () => {
 
   beforeEach(async function() {
     //Deploy CatDoge
-    cd = (await deployer("CatDoge")) as CatDoge;
+    cd = (await deployer("CatDoge")) as Token;
 
     //Set Presale args
     const rate = (3 * 10 ** 9).toString();
@@ -43,7 +43,7 @@ describe.skip("CatDoge Presale Test", () => {
     const minBuyLimit = toWei(0.01);   //in BNB 
 
     //Deploy Presale
-    cdps = (await deployer("PreSale", rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as PreSale;
+    cdps = (await deployer("PreSale", rate, wallet, token, openingTime, closingTime, caps, minBuyLimit)) as Presale;
 
     //Get ready for Presale
     await cd.excludeFromFee(cdps.address);

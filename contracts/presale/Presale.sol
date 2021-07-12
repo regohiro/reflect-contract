@@ -11,7 +11,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract Presale is Context, Ownable, ReentrancyGuard {
   using SafeERC20 for IERC20; 
 
-  // CatDoge Token
+  // The Token
   IERC20 public token;
 
   // Address where funds are collected
