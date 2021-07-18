@@ -365,7 +365,7 @@ describe("Final Test", () => {
   describe("Auto BTCB test", async () => {
     before(async () => {
       //Change numTokensSellToAddToLiquidity value for testing env
-      await cd.updateNumTokensSellToAddToLiquidity("30000");
+      // await cd.updateNumTokensSellToAddToLiquidity("30000");
       
       //Turn off buyLimit
       await cd.updateBuyLimit("0");
