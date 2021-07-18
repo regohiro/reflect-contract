@@ -4,8 +4,6 @@ pragma solidity ^0.8.4;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./ReflectiveToken.sol";
 
-// import "hardhat/console.sol";
-
 contract Token is ReflectiveToken {
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -38,7 +36,6 @@ contract Token is ReflectiveToken {
   event OnStakingExclude(address account);
   event OnWithdrawIsolatedBTC(uint256 amount);
 
-  //Tax: 1.5% + 13.5% = 15%
   constructor(
     string memory _name,
     string memory _symbol,
@@ -73,8 +70,12 @@ contract Token is ReflectiveToken {
     uint256 currentRate = _getRate();
     uint256 rSwapFee = tSwapFee * currentRate;
 
-    if (_stakingExcluded.contains(address(this))) _tOwned[address(this)] += tSwapFee;
-    else _rOwned[address(this)] += rSwapFee;
+    if (_stakingExcluded.contains(address(this))) {
+      _tOwned[address(this)] += tSwapFee;
+      _rOwned[address(this)] += rSwapFee;
+    }else{
+      _rOwned[address(this)] += rSwapFee;
+    } 
   }
 
   function _getRate() internal view override returns (uint256) {

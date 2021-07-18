@@ -2,9 +2,8 @@
 pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/Context.sol";
-import "./LiquidityAcquisition.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-// import "hardhat/console.sol";
+import "./LiquidityAcquisition.sol";
 
 contract ReflectiveERC20 is IERC20, Context, LiquidityAcquisition {
   mapping(address => uint256) internal _rOwned;
