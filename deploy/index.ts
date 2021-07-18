@@ -14,8 +14,8 @@ async function main() {
   setDefaultSigner(owner);
 
   //Set Token contract args
-  const name = "CatDoge";
-  const symbol = "CATDOGE";
+  const name = "DontApeThis";
+  const symbol = "DAT";
   const totalSupply = (10**15).toString(); //NO DECIMAL
   const decimals = "3";
   const reflectionFee = "15";
@@ -25,12 +25,12 @@ async function main() {
   const cd = await deployer("Token", name, symbol, totalSupply, decimals, reflectionFee, swapFee) as Token;
 
   //Set Presale contract args
-  const rate = (3 * 10 ** 9).toString(); //1BNB = ? tokens
+  const rate = (3 * 10 ** 9).toString(); //1BNB = ? tokens (NO DECIMAL)
   const wallet = ownerAddr;
   const token = cd.address;
-  const openingTime = (toUnix("7/8/2021 20:25:00")).toString();
-  const closingTime = (toUnix("7/8/2021 21:00:00")).toString();
-  const caps = toBN(3);  //in BNB
+  const openingTime = (toUnix("7/23/2021 20:25:00")).toString();
+  const closingTime = (toUnix("7/25/2021 21:00:00")).toString();
+  const caps = toBN(10);  //in BNB
   const minBuyLimit = toWei(0.01);   //in BNB 
 
   //Deploy Presale Contract
