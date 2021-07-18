@@ -3,9 +3,8 @@ pragma solidity ^0.8.4;
 
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./ReflectiveToken.sol";
-// import "hardhat/console.sol";
 
-contract Token is ReflectiveToken { 
+contract Token is ReflectiveToken {
   using EnumerableSet for EnumerableSet.AddressSet;
 
   mapping(address => uint256) public stakeValue;
@@ -26,7 +25,7 @@ contract Token is ReflectiveToken {
   uint256 public buyLimit;
   uint256 public sellLimit;
 
-  uint256 public numTokensSellToAddToLiquidity; 
+  uint256 public numTokensSellToAddToLiquidity;
   uint256 private constant DISTRIBUTION_MULTIPLIER = 2**64;
 
   EnumerableSet.AddressSet _stakingExcluded;
@@ -37,7 +36,6 @@ contract Token is ReflectiveToken {
   event OnStakingExclude(address account);
   event OnWithdrawIsolatedBTC(uint256 amount);
 
-  //Tax: 1.5% + 13.5% = 15%
   constructor(
     string memory _name,
     string memory _symbol,
@@ -45,11 +43,11 @@ contract Token is ReflectiveToken {
     uint256 _decimals,
     uint256 _reflectionFee,
     uint256 _swapFee
-  ) ReflectiveToken(_name, _symbol, _totalSupply, uint8(_decimals), uint8(_reflectionFee), uint8(_swapFee)) { 
+  ) ReflectiveToken(_name, _symbol, _totalSupply, uint8(_decimals), uint8(_reflectionFee), uint8(_swapFee)) {
     _tOwned[_msgSender()] = _tTotal;
     wallet = _msgSender();
 
-    //0.03% of total supply 
+    //0.03% of total supply
     numTokensSellToAddToLiquidity = (3000000 * _tTotal) / 10**10;
 
     // 0.1% of total supply on both buy/sell initially
@@ -72,8 +70,12 @@ contract Token is ReflectiveToken {
     uint256 currentRate = _getRate();
     uint256 rSwapFee = tSwapFee * currentRate;
 
-    if (_stakingExcluded.contains(address(this))) _tOwned[address(this)] += tSwapFee;
-    else _rOwned[address(this)] += rSwapFee;
+    if (_stakingExcluded.contains(address(this))) {
+      _tOwned[address(this)] += tSwapFee;
+      _rOwned[address(this)] += rSwapFee;
+    }else{
+      _rOwned[address(this)] += rSwapFee;
+    } 
   }
 
   function _getRate() internal view override returns (uint256) {
@@ -129,15 +131,21 @@ contract Token is ReflectiveToken {
 
     uint256 senderDividends;
 
-    if (_stakingExcluded.contains(sender)) _tOwned[sender] -= amount;
-    else {
+    if (_stakingExcluded.contains(sender)) {
+      _tOwned[sender] -= amount;
+      _rOwned[sender] -= rAmount;
+    } else {
       senderDividends = dividendsOf(sender);
       totalStaked -= stakeValue[sender];
       _rOwned[sender] -= rAmount;
     }
 
-    if (_stakingExcluded.contains(recipient)) _tOwned[recipient] += tTransferAmount;
-    else _rOwned[recipient] += rTransferAmount;
+    if (_stakingExcluded.contains(recipient)) {
+      _tOwned[recipient] += tTransferAmount;
+      _rOwned[recipient] += rTransferAmount;
+    } else {
+      _rOwned[recipient] += rTransferAmount;
+    }
 
     _takeSwapFee(tSwapFee);
     _reflectFee(rFee, tFee);
@@ -294,7 +302,7 @@ contract Token is ReflectiveToken {
 
   function withdrawIsolatedBtc() external onlyOwner {
     uint256 pendingBtc = totalDistributions - totalWithdrawn;
-    uint256 isolatedBtc = WBTC.balanceOf(address(this))- pendingBtc;
+    uint256 isolatedBtc = WBTC.balanceOf(address(this)) - pendingBtc;
 
     if (isolatedBtc > 0) {
       WBTC.transfer(wallet, isolatedBtc);
