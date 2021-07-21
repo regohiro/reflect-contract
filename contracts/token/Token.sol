@@ -268,21 +268,6 @@ contract Token is ReflectiveToken {
     _withdraw(_msgSender(), share);
   }
 
-  function includeInStaking(address account) external onlyOwner {
-    require(_stakingExcluded.contains(account), "Account already included");
-    uint256 balance = _tOwned[account];
-
-    _tOwned[account] = 0;
-    _rOwned[account] = reflectionFromToken(balance);
-    totalStaked += balance;
-    stakeValue[account] = balance;
-    stakerPayouts[account] = balance * profitPerShare;
-
-    _stakingExcluded.remove(account);
-
-    emit OnStakingInclude(account);
-  }
-
   function excludeFromStaking(address account) external onlyOwner {
     require(!_stakingExcluded.contains(account), "Account already excluded");
     uint256 balance = tokenFromReflection(_rOwned[account]);
