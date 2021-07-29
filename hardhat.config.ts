@@ -32,7 +32,6 @@ var blockchain = "bsc";
 
 const MNEMONIC = process.env.MNEMONIC || "";
 const MNEMONIC_MAINNET = process.env.MNEMONIC_MAINNET || "";
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "";
 const MORALIS_API_KEY = process.env.MORALIS_API_KEY || "";
 
@@ -68,8 +67,8 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
       mnemonic: _mnemonic,
       path: "m/44'/60'/0'/0",
     },
-    chainId: chainIds[network],
-    url,
+    chainId: 56,
+    url: "https://speedy-nodes-nyc.moralis.io/7f47f4c3ea9c80789f16873a/bsc/mainnet",
   };
 }
 
