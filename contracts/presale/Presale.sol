@@ -141,6 +141,10 @@ contract Presale is Context, Ownable, ReentrancyGuard {
     rate = _rate;
   }
 
+  function updateWallet(address _wallet) external onlyOwner {
+    wallet = _wallet;
+  }
+
   function setPresaleTime(uint256 _openingTime, uint256 _closingTime) external onlyOwner {
     require(_openingTime >= block.timestamp, "Crowdsale: Invalid opening time");
     require(_closingTime >= _openingTime, "Crowdsale: closing time < opening time");
