@@ -15,8 +15,8 @@ async function main() {
   const rate = (56000000000).toString(); //1BNB = ? tokens (NO DECIMAL)
   const wallet = "0xb801C377f7578331A8f4EF5cFD48757146a6CF50";
   const token = "0x7aFB9E961304B732a54122Bec5D5770ccacE1516";
-  const openingTime = (toUnix("7/31/2021 00:30:00")).toString();
-  const closingTime = (toUnix("8/1/2021 2:30:00")).toString();
+  const openingTime = (toUnix("2021-07-30T15:30:00.000Z")).toString();
+  const closingTime = (toUnix("2021-08-01T17:30:00.000Z")).toString();
   const caps = toWei(20);  //in BNB
   const minBuyLimit = toWei(0.01);   //in BNB 
 
