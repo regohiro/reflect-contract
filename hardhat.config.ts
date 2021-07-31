@@ -31,7 +31,7 @@ const chainIds = {
 var blockchain = "bsc";
 
 const MNEMONIC = process.env.MNEMONIC || "";
-const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY || "";
+const MNEMONIC_MAINNET = process.env.MNEMONIC_MAINNET || "";
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY || "";
 const MORALIS_API_KEY = process.env.MORALIS_API_KEY || "";
 
@@ -47,8 +47,12 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 
 function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
   let url: string;
+  let _mnemonic = MNEMONIC;
 
   if(network == "bsctestnet" || network == "bscmainnet"){
+    if(network == "bscmainnet"){
+      _mnemonic = MNEMONIC_MAINNET;
+    }
     blockchain = "bsc";
     url = "https://" + "speedy-nodes-nyc.moralis.io/" + MORALIS_API_KEY + "/bsc/" + network.substr(3);
   }else{
@@ -60,11 +64,11 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
     accounts: {
       count: 10,
       initialIndex: 0,
-      mnemonic: MNEMONIC,
+      mnemonic: _mnemonic,
       path: "m/44'/60'/0'/0",
     },
-    chainId: chainIds[network],
-    url,
+    chainId: 56,
+    url: "https://speedy-nodes-nyc.moralis.io/7f47f4c3ea9c80789f16873a/bsc/mainnet",
   };
 }
 
@@ -102,7 +106,7 @@ const config: HardhatUserConfig = {
     bscmainnet: createTestnetConfig("bscmainnet"),
   },
   etherscan: {
-    apiKey: blockchain == "bsc" ? BSCSCAN_API_KEY : ETHERSCAN_API_KEY,
+    apiKey: BSCSCAN_API_KEY
   },
   gasReporter: {
     currency: "USD",
