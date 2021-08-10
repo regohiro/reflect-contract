@@ -5,7 +5,8 @@
   "main": "index.ts",
   "scripts": {
     "compile": "npx hardhat compile",
-    "test": "npx hardhat test"
+    "test": "npx hardhat test",
+    "postinstall": "./rebuild.sh"
   },
   "author": "",
   "license": "MIT",
