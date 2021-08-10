@@ -72,7 +72,7 @@ contract Presale is Context, Ownable, ReentrancyGuard {
     address purchaser = _msgSender();
 
     //Calculate token amount to transfer
-    uint256 tokens = getTokenAmoount(weiAmount);
+    uint256 tokens = getTokenAmount(weiAmount);
 
     //Checks
     _preValidatePurchase(weiAmount);
@@ -87,7 +87,7 @@ contract Presale is Context, Ownable, ReentrancyGuard {
     require(minBuyLimit <= weiAmount, "Presale: need to buy more");
   }
 
-  function getTokenAmoount(uint256 _weiAmount) public view returns (uint256) {
+  function getTokenAmount(uint256 _weiAmount) public view returns (uint256) {
     uint256 baseTokenAmount = _weiAmount * rate;
     uint256 timeLeft = closingTime - block.timestamp;
     uint256 spentAmount = _weiAmount > maxDiscount ? maxDiscount : _weiAmount;
