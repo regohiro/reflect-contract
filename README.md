@@ -21,7 +21,7 @@ $ yarn compile
 Note: requires mnemonic and Moralis API key
 
 ```
-$ npx hardhat run deploy --network bsctestnet
+$ npx hardhat run scripts/token-deploy.ts --network bsctestnet
 ```
 
 ### Test contract locally (BSC mainnet fork)
