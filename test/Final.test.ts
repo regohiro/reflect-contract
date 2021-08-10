@@ -2,7 +2,7 @@ import { Presale } from './../typechain/Presale.d';
 import { DATToken } from './../typechain/DATToken.d';
 import { IERC20 } from './../typechain/IERC20.d';
 import { IUniswapV2Router02 } from './../typechain/IUniswapV2Router02.d';
-import { toWei, deployer, setDefaultSigner, advanceTimeAndBlock, getCurrentTime } from "../utilities";
+import { toWei, deployer, setDefaultSigner, advanceTimeAndBlock, getCurrentTime } from "../utils";
 import { ethers, waffle } from "hardhat";
 import chai from "chai";
 import { solidity } from "ethereum-waffle";

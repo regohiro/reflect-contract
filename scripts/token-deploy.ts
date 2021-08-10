@@ -1,5 +1,5 @@
 import { ethers, waffle } from "hardhat";
-import { verify, deployToLiveNetwork, setDefaultSigner, deployer } from '../utilities';
+import { verify, deployToLiveNetwork, setDefaultSigner, deployer } from '../utils';
  
 async function main() {
   //When called, it will print receipt and verify to BscScan

@@ -1,6 +1,6 @@
 
 import { ethers } from "hardhat";
-import { setDefaultSigner, deployer, deployToLiveNetwork, verify, toUnix, toWei } from '../utilities';
+import { setDefaultSigner, deployer, deployToLiveNetwork, verify, toUnix, toWei } from '../utils';
 
 async function main() {
   //When called, it will print receipt and verify to BscScan
