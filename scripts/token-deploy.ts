@@ -1,21 +1,30 @@
 import { ethers, waffle } from "hardhat";
-import { Presale } from './../typechain/Presale.d';
-import { Token } from './../typechain/Token.d';
-import { toBN, getContractInstance } from '../utilities';
+import { verify, deployToLiveNetwork, setDefaultSigner, deployer } from '../utilities';
  
 async function main() {
-  //List accounts
-  const accounts = await ethers.provider.listAccounts(); //returns addresses
-  const owner = accounts[0];
-  
-  /* Get contract instance, there is no need to put contract address as long as you deployed the contract with printLog enabled AND if you are accessing the contract you just deployed recently. */
-  const cd = await getContractInstance("CatDoge") as Token;
+  //When called, it will print receipt and verify to BscScan
+  deployToLiveNetwork();
 
-  console.log(`Decimals: ${await cd.decimals()}`);
+  //Set contract signer (owner)
+  const signers = await ethers.getSigners();
+  const owner = signers[0];
+  setDefaultSigner(owner);
+
+  //Set Token contract args
+  const name = "DontApeThis";
+  const symbol = "DAT";
+  const totalSupply = (10**10).toString(); //NO DECIMAL
+  const decimals = "18";
+  const reflectionFee = "15";
+  const swapFee = "135";
+
+  //Deploy DAT Token
+  await deployer("Token", name, symbol, totalSupply, decimals, reflectionFee, swapFee);
 }
 
 //Excute deploy
 main()
+  .then(verify)
   .then(() => process.exit(0))
   .catch((error: Error) => {
     console.error(error);
