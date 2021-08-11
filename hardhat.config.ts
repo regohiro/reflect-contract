@@ -111,7 +111,7 @@ const config: HardhatUserConfig = {
   gasReporter: {
     currency: "USD",
     gasPrice: 100,
-    enabled: process.env.REPORT_GAS ? true : false,
+    enabled: false,
   },
   typechain: {
     outDir: "typechain",
