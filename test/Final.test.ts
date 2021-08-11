@@ -177,7 +177,7 @@ describe("Final Test", () => {
 
   /***PRESALE TEST***/
 
-  describe.skip("Classic presale test (no bouns)", () => {
+  describe("Classic presale test (no bouns)", () => {
     describe("Before presale", () => {
       it("isOpen should return false", async () => {
         expect(await presale.isOpen()).to.be.false;
@@ -273,7 +273,7 @@ describe("Final Test", () => {
 
   /***NEW PRESALE TEST***/
 
-  describe("Presale test", () => {
+  describe.skip("Presale test", () => {
     before(async () => {
       const minBuyLimit = await presale.minBuyLimit();
       const maxDiscount = await presale.maxDiscount();
@@ -362,7 +362,7 @@ describe("Final Test", () => {
 
   /***Liquidity TEST***/
 
-  describe.skip("Liquidty test", () => {
+  describe("Liquidty test", () => {
     before(async () => {
       //Transfer leftover tokens from presale to other users
       const leftover = await dat.balanceOf(presaleWallet.address);
@@ -402,7 +402,7 @@ describe("Final Test", () => {
 
     describe("After providing liquity", async () => {
       before(async () => {
-        const tokenToAdd = toWei(1.625 * 10 ** 14, 3); //1.625x10^14 tokens
+        const tokenToAdd = toWei(250*rate); //250BNB worth of tokens
         const bnbToAdd = toWei(250); //250BNB
 
         await dat.approve(router.address, tokenToAdd);
@@ -437,12 +437,13 @@ describe("Final Test", () => {
         const bnbReceived = bnbBalanceAfter.sub(bnbBalanceBefore);
 
         //BNB received should be around 85% of 1BNB
+        //@ts-ignore
         expect(bnbReceived).to.be.within(toWei(0.83), toWei(0.87));
       });
     });
   });
 
-  describe.skip("Auto BTCB test", async () => {
+  describe("Auto BTCB test", async () => {
     before(async () => {
       //Change numTokensSellToAddToLiquidity value for testing env
       // await dat.updateNumTokensSellToAddToLiquidity("30000");
@@ -474,7 +475,7 @@ describe("Final Test", () => {
     });
 
     it("Token contract should have BTCB for distribution", async () => {
-      expect(await btcb.balanceOf(dat.address)).to.be.greaterThan(0);
+      expect(await btcb.balanceOf(dat.address)).to.be.gt(0);
     });
 
     it("Charile should get some BTCB after withdraw", async () => {
@@ -482,16 +483,17 @@ describe("Final Test", () => {
       await dat.connect(charile).withdraw();
       const btcWithdrawn = await dat.btcWithdrawn(charile.address);
 
-      expect(await btcb.balanceOf(charile.address)).to.be.greaterThan(0);
+      expect(await btcb.balanceOf(charile.address)).to.be.gt(0);
       expect(await btcb.balanceOf(charile.address)).to.equal(btcWithdrawn);
     });
 
     it("Dev wallet should have around 10% of BTCB reward", async () => {
       const devBtcBalance = await btcb.balanceOf(dev.address);
       const totalDistributions = await dat.totalDistributions();
-      const percentage = devBtcBalance.mul(100).div(devBtcBalance.add(totalDistributions));
+      const percentage = devBtcBalance.mul(1000).div(devBtcBalance.add(totalDistributions));
 
-      expect(percentage).to.be.within(9.9, 10.1);
+      //@ts-ignore
+      expect(percentage).to.be.within(99, 101);
     });
 
     it("Charile should have more tokens than before", async () => {
@@ -500,7 +502,7 @@ describe("Final Test", () => {
       const rewarded = balanceAfter.sub(balanceBefore);
 
       // console.log(`Charile token reward from tax: ${rewarded}`);
-      expect(rewarded).to.be.greaterThan(0);
+      expect(rewarded).to.be.gt(0);
     });
 
     it("Charile should be able to stake more", async () => {
@@ -511,7 +513,7 @@ describe("Final Test", () => {
     });
   });
 
-  describe.skip("Transfer test", async () => {
+  describe("Transfer test", async () => {
     it("Tokens can be burned", async () => {
       const toBurn = toWei(5 * 10 ** 5);
       const burnAddr = "0x000000000000000000000000000000000000dEaD";
@@ -545,6 +547,7 @@ describe("Final Test", () => {
         const toTransfer = (await dat.balanceOf(charile.address)).div(4);
         await dat.connect(charile).transfer(eric.address, toTransfer);
 
+        //@ts-ignore
         expect(await dat.balanceOf(eric.address)).to.be.within(toTransfer.mul(8).div(10), toTransfer.mul(9).div(10));
       });
     });
