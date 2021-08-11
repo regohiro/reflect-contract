@@ -45,7 +45,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 });
 
 
-function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig {
+function createNetworkConfig(network: keyof typeof chainIds): NetworkUserConfig {
   let url: string;
   let _mnemonic = MNEMONIC;
 
@@ -67,8 +67,8 @@ function createTestnetConfig(network: keyof typeof chainIds): NetworkUserConfig 
       mnemonic: _mnemonic,
       path: "m/44'/60'/0'/0",
     },
-    chainId: 56,
-    url: "https://speedy-nodes-nyc.moralis.io/7f47f4c3ea9c80789f16873a/bsc/mainnet",
+    chainId: chainIds[network],
+    url,
   };
 }
 
@@ -97,13 +97,13 @@ const config: HardhatUserConfig = {
         url: "https://" + "speedy-nodes-nyc.moralis.io/" + MORALIS_API_KEY + "/bsc/mainnet"
       },
     },
-    mainnet: createTestnetConfig("mainnet"),
-    goerli: createTestnetConfig("goerli"),
-    kovan: createTestnetConfig("kovan"),
-    rinkeby: createTestnetConfig("rinkeby"),
-    ropsten: createTestnetConfig("ropsten"),
-    bsctestnet: createTestnetConfig("bsctestnet"),
-    bscmainnet: createTestnetConfig("bscmainnet"),
+    mainnet: createNetworkConfig("mainnet"),
+    goerli: createNetworkConfig("goerli"),
+    kovan: createNetworkConfig("kovan"),
+    rinkeby: createNetworkConfig("rinkeby"),
+    ropsten: createNetworkConfig("ropsten"),
+    bsctestnet: createNetworkConfig("bsctestnet"),
+    bscmainnet: createNetworkConfig("bscmainnet"),
   },
   etherscan: {
     apiKey: BSCSCAN_API_KEY
