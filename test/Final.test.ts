@@ -492,7 +492,6 @@ describe("Final Test", () => {
       const totalDistributions = await dat.totalDistributions();
       const percentage = devBtcBalance.mul(1000).div(devBtcBalance.add(totalDistributions));
 
-      //@ts-ignore
       expect(percentage).to.be.within(99, 101);
     });
 
