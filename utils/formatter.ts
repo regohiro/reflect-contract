@@ -1,14 +1,14 @@
 import { BigNumber } from "ethers";
 
-export const toBN = (value: number): BigNumber => {
-  const valueString = value.toLocaleString("fullwide", { useGrouping: false });
-  const valueBN = BigNumber.from(valueString);
+export const toBN = (value: number | string): BigNumber => {
+  const valueBN = BigNumber.from(value);
   return valueBN;
 }
 
 export const toWei = (value: number, decimals: number = 18): BigNumber => {
   const valueWei = value * 10**decimals;
-  const valueWeiBN = toBN(valueWei);
+  const valueWeiString = valueWei.toLocaleString("fullwide", { useGrouping: false });
+  const valueWeiBN = toBN(valueWeiString);
   return valueWeiBN;
 }
 
