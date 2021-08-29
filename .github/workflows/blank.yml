@@ -21,7 +21,6 @@ jobs:
     runs-on: ubuntu-latest
     env:
       MNEMONIC: 'test test test test test test test test test test test junk'
-      REPORT_GAS: 100000
       MORALIS_API_KEY: ${{ secrets.MORALIS_API_KEY }}
       BSCSCAN_API_KEY: ${{ secrets.BSCSCAN_API_KEY }}
 
