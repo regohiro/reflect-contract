@@ -25,7 +25,9 @@ const chainIds = {
   rinkeby: 4,
   ropsten: 3,
   bsctestnet: 97,
-  bscmainnet: 56
+  bscmainnet: 56,
+  arbtestnet: 421611,
+  arbmainnet: 8547
 };
 
 var blockchain = "bsc";
