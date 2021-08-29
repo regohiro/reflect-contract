@@ -1,28 +1,31 @@
-import { BigNumber } from "ethers";
+import { BigNumber, utils } from "ethers";
 
-export const toBN = (value: number | string): BigNumber => {
-  const valueBN = BigNumber.from(value);
+export const toBN = (value: number): BigNumber => {
+  const valueString = value.toString();
+  const valueBN = BigNumber.from(valueString);
   return valueBN;
-}
+};
 
 export const toWei = (value: number, decimals: number = 18): BigNumber => {
-  const valueWei = value * 10**decimals;
-  const valueWeiString = valueWei.toLocaleString("fullwide", { useGrouping: false });
-  const valueWeiBN = toBN(valueWeiString);
+  const valueString = value.toString();
+  const valueWeiBN = utils.parseUnits(valueString, decimals);
   return valueWeiBN;
-}
+};
 
 export const fromBN = (valueBN: BigNumber): number => {
   const valueString = valueBN.toString();
   const valueNumber = Number(valueString);
   return valueNumber;
-}
+};
 
-export const fromWei = (valueWeiBN: BigNumber, decimals: number = 18): number => {
-  const valueWeiNumber = fromBN(valueWeiBN);
-  const valueNumber = valueWeiNumber / 10**decimals;
+export const fromWei = (
+  valueWeiBN: BigNumber,
+  decimals: number = 18
+): number => {
+  const valueString = utils.formatUnits(valueWeiBN, decimals);
+  const valueNumber = Number(valueString);
   return valueNumber;
-}
+};
 
 export const fromSec = (sec: number): number => sec * 1000;
 export const fromMin = (min: number): number => min * 60000;
