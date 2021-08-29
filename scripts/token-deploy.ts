@@ -1,5 +1,5 @@
 import { ethers, waffle } from "hardhat";
-import { verify, deployToLiveNetwork, setDefaultSigner, deployer } from '../utils';
+import { verify, deployToLiveNetwork, setDefaultSigner, deployer, toBN } from '../utils';
  
 async function main() {
   //When called, it will print receipt and verify to BscScan
@@ -11,15 +11,15 @@ async function main() {
   setDefaultSigner(owner);
 
   //Set Token contract args
-  const name = "DontApeThis";
-  const symbol = "DAT";
-  const totalSupply = (10**10).toString(); //NO DECIMAL
+  const name = "MyReflectToken";
+  const symbol = "MRT";
+  const totalSupply = toBN(10**10) //NO DECIMAL
   const decimals = "18";
   const reflectionFee = "15";
   const swapFee = "135";
 
-  //Deploy DAT Token
-  await deployer("Token", name, symbol, totalSupply, decimals, reflectionFee, swapFee);
+  //Deploy Token
+  await deployer("ReflectToken", name, symbol, totalSupply, decimals, reflectionFee, swapFee);
 }
 
 //Excute deploy

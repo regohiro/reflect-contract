@@ -63,7 +63,7 @@ describe("Reflect token test", () => {
     const reflectionFee = "15";
     const swapFee = "135";
 
-    //Deploy DAT token
+    //Deploy Token
     token = (await deployer(
       "ReflectToken",
       name,
